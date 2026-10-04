@@ -1,9 +1,2 @@
 ﻿@import "tailwindcss";
 @plugin "@tailwindcss/typography";
-
-@layer base {
-  body {
-    background-color: #F5EFEB;
-    color: #1A1817;
-  }
-}
