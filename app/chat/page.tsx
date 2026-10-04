@@ -38,7 +38,7 @@ export default function ChatIndexPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center">
+      <div className="min-h-[100dvh] bg-[#FAF8F5] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <Loader2 className="w-8 h-8 animate-spin text-[#C85A32]" />
           <p className="font-serif text-amber-900/70 text-sm">Memuat ruang pesan sastra...</p>
@@ -48,7 +48,7 @@ export default function ChatIndexPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5]">
+    <div className="min-h-[100dvh] bg-[#FAF8F5]">
       <ChatList
         conversations={conversations}
         onNewChatClick={() => setIsNewModalOpen(true)}

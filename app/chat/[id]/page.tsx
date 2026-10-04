@@ -54,7 +54,7 @@ export default async function ChatDetailPage({ params }: { params: Promise<{ id:
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5]">
+    <div className="h-[100dvh] w-full bg-[#FAF8F5] overflow-hidden flex flex-col">
       <ChatWindow
         conversationId={conversationId}
         currentUserId={user.uid}

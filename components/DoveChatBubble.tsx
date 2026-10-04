@@ -16,6 +16,7 @@ import {
   PenLine,
 } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 interface SearchUserItem {
   user_id: string;
@@ -25,6 +26,7 @@ interface SearchUserItem {
 }
 
 export default function DoveChatBubble() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [unreadTotal, setUnreadTotal] = useState(0);
@@ -245,39 +247,45 @@ export default function DoveChatBubble() {
     }
   };
 
+  if (pathname?.startsWith('/chat')) {
+    return null;
+  }
+
   return (
     <>
-      {/* Tombol Chat Melayang (Message Action Button) */}
-      <div className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-40 select-none">
-        <button
-          onClick={() => {
-            const nextState = !isOpen;
-            setIsOpen(nextState);
-            if (nextState) fetchConversations();
-          }}
-          className="relative group w-13 h-13 rounded-full bg-[#C85A32] hover:bg-[#A94728] text-white shadow-md active:scale-95 transition-all duration-150 flex items-center justify-center border border-[#A94728] cursor-pointer"
-          title="Pesan Sastra"
-          aria-label="Buka Pesan Sastra"
-        >
-          <MessageCircle className="w-6 h-6 text-white" />
+      {/* Tombol Chat Melayang (Message Action Button) - disembunyikan saat modal terbuka agar tidak menumpuk */}
+      {!isOpen && (
+        <div className="fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] right-4 md:bottom-6 md:right-6 z-40 select-none">
+          <button
+            onClick={() => {
+              const nextState = !isOpen;
+              setIsOpen(nextState);
+              if (nextState) fetchConversations();
+            }}
+            className="relative group w-13 h-13 rounded-full bg-[#C85A32] hover:bg-[#A94728] text-white shadow-lg active:scale-95 transition-all duration-150 flex items-center justify-center border border-[#A94728] cursor-pointer"
+            title="Pesan Sastra"
+            aria-label="Buka Pesan Sastra"
+          >
+            <MessageCircle className="w-6 h-6 text-white" />
 
-          {/* Badge Pesan Belum Terbaca */}
-          {unreadTotal > 0 && (
-            <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 bg-[#2C2A29] border-2 border-white text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-xs">
-              {unreadTotal > 99 ? '99+' : unreadTotal}
+            {/* Badge Pesan Belum Terbaca */}
+            {unreadTotal > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 bg-[#2C2A29] border-2 border-white text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-xs">
+                {unreadTotal > 99 ? '99+' : unreadTotal}
+              </span>
+            )}
+
+            {/* Tooltip */}
+            <span className="absolute -top-8 right-0 bg-[#2C2A29] text-white text-[11px] font-sans py-0.5 px-2 rounded shadow-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+              Pesan Sastra
             </span>
-          )}
+          </button>
+        </div>
+      )}
 
-          {/* Tooltip */}
-          <span className="absolute -top-8 right-0 bg-[#2C2A29] text-white text-[11px] font-sans py-0.5 px-2 rounded shadow-xs opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
-            Pesan Sastra
-          </span>
-        </button>
-      </div>
-
-      {/* Floating Chat Modal / Drawer */}
+      {/* Floating Chat Modal / Drawer - Selalu terlihat utuh di atas navigasi bawah dan aman dari tepi atas */}
       {isOpen && (
-        <div className="fixed bottom-36 right-4 sm:bottom-22 sm:right-6 z-40 w-[92vw] sm:w-[380px] h-[520px] max-h-[80vh] bg-[#FFFDF9] rounded-2xl shadow-xl border border-[#E8DED6] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+        <div className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] right-2 sm:right-6 md:bottom-6 z-50 w-[calc(100vw-1rem)] sm:w-[380px] max-w-[420px] h-[min(560px,calc(100dvh-5.5rem-env(safe-area-inset-bottom,0px)))] bg-[#FFFDF9] rounded-2xl shadow-2xl border border-[#E8DED6] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150">
           {/* Header */}
           <div className="bg-[#FAF8F5] border-b border-[#E8DED6] text-[#2C2A29] px-4 py-3 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2.5">
@@ -356,7 +364,7 @@ export default function DoveChatBubble() {
           )}
 
           {/* Body Konten */}
-          <div className="flex-1 overflow-y-auto p-3.5 flex flex-col bg-[#FAF8F5]/60">
+          <div className="flex-1 overflow-y-auto p-3.5 flex flex-col bg-[#FAF8F5]/60 overscroll-contain">
             {activeConvId ? (
               /* --- TAMPILAN PESAN DALAM PERCAKAPAN --- */
               <div className="flex-1 flex flex-col space-y-2.5">
@@ -558,7 +566,7 @@ export default function DoveChatBubble() {
 
           {/* Footer Input saat percakapan terbuka */}
           {activeConvId && (
-            <div className="p-2.5 bg-[#FFFDF9] border-t border-[#E8DED6] shrink-0">
+            <div className="p-2.5 bg-[#FFFDF9] border-t border-[#E8DED6] shrink-0 z-10 shadow-xs">
               {isBlockedState ? (
                 <div className="text-center py-1 text-xs text-rose-700 font-medium flex items-center justify-center gap-1.5">
                   <ShieldAlert className="w-3.5 h-3.5" />

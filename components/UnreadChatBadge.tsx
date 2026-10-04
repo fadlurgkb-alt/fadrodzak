@@ -1,4 +1,4 @@
-'import client';
+'use client';
 import { useEffect, useState } from 'react';
 import { MessageSquare } from 'lucide-react';
 import Link from 'next/link';

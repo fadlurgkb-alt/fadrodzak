@@ -29,14 +29,16 @@ export default function BottomNav() {
     },
   ];
 
+  const isChatDetailPage = pathname?.startsWith('/chat/');
+
   return (
     <>
-      {/* Spacer agar konten bawah tidak tertutup */}
-      <div className="h-20" />
+      {/* Spacer agar konten halaman biasa tidak tertutup di mobile (tidak diperlukan di layar chat penuh) */}
+      {!isChatDetailPage && <div className="h-16 md:hidden" />}
 
-      {/* Navigasi Bawah */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-[#FAF8F5]/95 backdrop-blur-md border-t border-[#E8DED6] pb-safe z-50 shadow-xs">
-        <div className="max-w-md mx-auto flex justify-around items-center px-4 py-2">
+      {/* Navigasi Bawah Khusus Mobile (Disembunyikan di Desktop) */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-[#FAF8F5]/95 backdrop-blur-md border-t border-[#E8DED6] h-[calc(4rem+env(safe-area-inset-bottom,0px))] pb-[env(safe-area-inset-bottom,0px)] z-40 md:hidden shadow-xs">
+        <div className="max-w-md mx-auto h-16 flex justify-around items-center px-4">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive =

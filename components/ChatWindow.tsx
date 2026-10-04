@@ -124,9 +124,9 @@ export default function ChatWindow({
   }
 
   return (
-    <div className="max-w-3xl mx-auto h-[calc(100vh-4rem)] flex flex-col bg-[#FAF8F5] border-x border-amber-900/10 shadow-sm">
+    <div className="w-full max-w-3xl mx-auto h-[calc(100dvh-4rem-env(safe-area-inset-bottom,0px))] md:h-[100dvh] flex flex-col bg-[#FAF8F5] border-x border-amber-900/10 shadow-sm overflow-hidden relative">
       {/* Header */}
-      <div className="p-4 bg-white border-b border-amber-900/10 flex items-center justify-between shrink-0 shadow-xs">
+      <div className="p-3 sm:p-4 bg-white border-b border-amber-900/10 flex items-center justify-between shrink-0 shadow-xs z-10">
         <div className="flex items-center gap-3">
           <Link
             href="/chat"
@@ -186,7 +186,7 @@ export default function ChatWindow({
       </div>
 
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 overscroll-contain">
         {messages.length === 0 ? (
           <div className="text-center py-12 text-amber-900/50 font-serif text-sm">
             Belum ada pesan dalam percakapan ini. Kirim salam atau sapaan pertama!
@@ -202,7 +202,7 @@ export default function ChatWindow({
             return (
               <div key={m.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
                 <div
-                  className={`max-w-[75%] rounded-2xl px-4 py-3 shadow-xs font-serif ${
+                  className={`max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-3 shadow-xs font-serif ${
                     isMe
                       ? 'bg-[#C85A32] text-white rounded-tr-xs'
                       : 'bg-white text-[#2C2A29] border border-amber-900/10 rounded-tl-xs'
@@ -222,21 +222,21 @@ export default function ChatWindow({
             );
           })
         )}
-        <div ref={messagesEndRef} />
+        <div ref={messagesEndRef} className="h-4" />
       </div>
 
       {/* Error alert */}
       {errorMsg && (
-        <div className="px-4 py-2 bg-red-50 border-t border-red-200 text-red-700 text-xs flex items-center justify-between">
+        <div className="px-4 py-2 bg-red-50 border-t border-red-200 text-red-700 text-xs flex items-center justify-between shrink-0">
           <span>{errorMsg}</span>
-          <button onClick={() => setErrorMsg(null)} className="font-bold">
+          <button onClick={() => setErrorMsg(null)} className="font-bold cursor-pointer">
             &times;
           </button>
         </div>
       )}
 
       {/* Input bar */}
-      <div className="p-4 bg-white border-t border-amber-900/10 shrink-0">
+      <div className="p-3 sm:p-4 bg-white border-t border-amber-900/10 shrink-0 z-10 shadow-xs">
         {isBlockedState ? (
           <div className="text-center py-2 text-red-600 text-sm font-serif">
             Anda telah memblokir pengguna ini. Buka blokir untuk melanjutkan pesan.
@@ -248,13 +248,13 @@ export default function ChatWindow({
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Tulis pesan sastra... (maks 2000 karakter)"
-              className="flex-1 px-4 py-3 rounded-xl bg-[#FAF8F5] border border-amber-900/20 text-[#2C2A29] placeholder:text-amber-900/40 text-sm focus:outline-none focus:ring-2 focus:ring-[#C85A32]/30 font-serif"
+              className="flex-1 px-3.5 py-2.5 sm:px-4 sm:py-3 rounded-xl bg-[#FAF8F5] border border-amber-900/20 text-[#2C2A29] placeholder:text-amber-900/40 text-sm focus:outline-none focus:ring-2 focus:ring-[#C85A32]/30 font-serif"
               maxLength={2000}
             />
             <button
               type="submit"
               disabled={sending || !input.trim()}
-              className="p-3 bg-[#C85A32] text-white rounded-xl hover:bg-[#b04d29] transition disabled:opacity-50 shadow-sm flex items-center justify-center"
+              className="p-2.5 sm:p-3 bg-[#C85A32] text-white rounded-xl hover:bg-[#b04d29] transition disabled:opacity-50 shadow-sm flex items-center justify-center cursor-pointer shrink-0"
               title="Kirim Pesan"
             >
               {sending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}

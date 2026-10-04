@@ -1,8 +1,18 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Coffee, MessageCircle } from 'lucide-react';
 
 export default function Footer() {
+  const pathname = usePathname();
+
+  // Jangan tampilkan footer di halaman ruang percakapan penuh agar layout chat tidak terdorong
+  if (pathname?.startsWith('/chat/')) {
+    return null;
+  }
+
   return (
     <footer className="w-full mt-16 pb-24 border-t border-[#E8DED6] pt-8 text-center select-none bg-[#FAF8F5]">
       <div className="max-w-4xl mx-auto px-4 space-y-5">

@@ -11,7 +11,7 @@ interface ChatListProps {
 
 export default function ChatList({ conversations, onNewChatClick }: ChatListProps) {
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
+    <div className="max-w-2xl mx-auto px-4 pt-6 pb-28 md:pb-12">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-serif font-bold text-[#2C2A29]">Pesan Sastra</h1>
