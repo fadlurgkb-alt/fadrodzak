@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import Link from 'next/link';
 import pool from '../../lib/db';
 import { redirect } from 'next/navigation';
@@ -8,7 +8,20 @@ import { PenLine, BookOpen, Feather, ArrowLeft, Image } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
-export default async function TulisKaryaPage() {
+export default async function TulisKaryaPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const query = (await searchParams) || {};
+  const querySeri = typeof query.nama_cerita === 'string' ? query.nama_cerita : (typeof query.seri === 'string' ? query.seri : '');
+  const queryBab = typeof query.nomor_bab === 'string' ? query.nomor_bab : (typeof query.bab === 'string' ? query.bab : '');
+  const querySinopsis = typeof query.sinopsis === 'string' ? query.sinopsis : '';
+  const queryKategori = typeof query.kategori === 'string' ? query.kategori : (querySeri ? 'Novel & Cerbung' : 'Puisi');
+  const defaultJudul = typeof query.judul === 'string'
+    ? query.judul
+    : (querySeri && queryBab ? `${querySeri} — Bab ${queryBab}` : '');
+
   let currentUser: any = null;
   try {
     currentUser = await getCurrentUser();
@@ -114,6 +127,20 @@ export default async function TulisKaryaPage() {
           </p>
         </div>
 
+        {querySeri && (
+          <div className="p-4 rounded-2xl bg-[#FFF6EE] border border-[#F3D7C5] flex items-center justify-between gap-3 text-xs text-[#8A3B14]">
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-[#C85A32] shrink-0" />
+              <span>
+                Melanjutkan Seri: <strong className="font-serif font-bold text-[#1C1A19]">{querySeri}</strong> {queryBab ? `— Bab ${queryBab}` : ''}
+              </span>
+            </div>
+            <span className="text-[11px] bg-[#C85A32] text-white px-2.5 py-0.5 rounded-full font-medium">
+              Bab Baru
+            </span>
+          </div>
+        )}
+
         <form action={simpanKaryaAction} className="space-y-8">
           <div className="space-y-3">
             <label className="block text-xs font-semibold uppercase tracking-wider text-[#5C544F]">
@@ -134,7 +161,7 @@ export default async function TulisKaryaPage() {
                     type="radio"
                     name="kategori"
                     value={item.label}
-                    defaultChecked={idx === 0}
+                    defaultChecked={queryKategori ? item.label.toLowerCase() === queryKategori.toLowerCase() : idx === 0}
                     className="sr-only"
                   />
                   <span className="font-serif font-bold text-base text-[#1C1A19]">
@@ -156,6 +183,7 @@ export default async function TulisKaryaPage() {
               type="text"
               name="judul"
               required
+              defaultValue={defaultJudul}
               placeholder="Tulis judul naskah di sini..."
               className="w-full px-4 py-3 rounded-2xl border border-[#EAE2D9] bg-[#FAF8F5] focus:bg-[#FFFDF9] focus:border-[#C85A32] text-xl sm:text-2xl font-serif font-bold text-[#1C1A19] placeholder:text-[#A59A92] outline-none transition"
             />
@@ -172,6 +200,7 @@ export default async function TulisKaryaPage() {
                 <input
                   type="text"
                   name="nama_cerita"
+                  defaultValue={querySeri}
                   placeholder="Nama Buku / Seri Novel (contoh: Lentera di Ujung Senja)"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#EAE2D9] bg-white text-xs text-[#2C2A29] outline-none focus:border-[#C85A32]"
                 />
@@ -180,6 +209,7 @@ export default async function TulisKaryaPage() {
                 <input
                   type="number"
                   name="nomor_bab"
+                  defaultValue={queryBab}
                   placeholder="Nomor Bab (misal: 1)"
                   className="w-full px-3.5 py-2.5 rounded-xl border border-[#EAE2D9] bg-white text-xs text-[#2C2A29] outline-none focus:border-[#C85A32]"
                 />
@@ -190,6 +220,7 @@ export default async function TulisKaryaPage() {
               <input
                 type="text"
                 name="sinopsis"
+                defaultValue={querySinopsis}
                 placeholder="Sinopsis singkat atau kutipan pengantar satu kalimat..."
                 className="w-full px-3.5 py-2.5 rounded-xl border border-[#EAE2D9] bg-white text-xs text-[#2C2A29] outline-none focus:border-[#C85A32] font-serif italic"
               />

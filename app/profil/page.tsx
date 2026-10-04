@@ -1,4 +1,4 @@
-﻿import pool from '../../lib/db';
+import pool from '../../lib/db';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { revalidatePath } from 'next/cache';
@@ -24,6 +24,7 @@ import {
   Award,
   Bookmark,
   PenLine,
+  Plus,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -56,6 +57,10 @@ interface KaryaRow {
   jumlah_komentar?: number;
   total_komentar?: number;
   created_at: string | Date;
+  nomor_bab?: number | null;
+  nama_cerita?: string | null;
+  sinopsis?: string | null;
+  status_cerita?: string | null;
 }
 
 async function hapusKarya(formData: FormData) {
@@ -540,45 +545,90 @@ export default async function ProfilPage() {
             </div>
           ) : (
             <div className="space-y-3.5">
-              {karyaList.map((karya) => (
-                <article
-                  key={karya.id}
-                  className="bg-[#FFFDF9] p-5 sm:p-6 rounded-2xl border border-[#E8DED6] shadow-2xs transition"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-                    <div>
-                      <span className="text-[11px] font-semibold text-[#C85A32] uppercase tracking-wider">
-                        {karya.kategori}
-                      </span>
-                      <h3 className="text-lg font-serif font-bold text-[#2C2A29] mt-0.5">
+              {karyaList.map((karya) => {
+                const isCerita =
+                  (karya.kategori || '').toLowerCase().includes('novel') ||
+                  (karya.kategori || '').toLowerCase().includes('cerbung') ||
+                  Boolean(karya.nama_cerita);
+                const nextBabNumber = (Number(karya.nomor_bab) || 1) + 1;
+                const seriesName = karya.nama_cerita || karya.judul;
+
+                return (
+                  <article
+                    key={karya.id}
+                    className="bg-[#FFFDF9] p-5 sm:p-6 rounded-2xl border border-[#E8DED6] shadow-2xs transition"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap mb-1">
+                          <span className="text-[11px] font-semibold text-[#C85A32] uppercase tracking-wider">
+                            {karya.kategori}
+                          </span>
+                          {karya.nomor_bab && (
+                            <span className="text-[10px] font-serif font-bold px-2 py-0.5 rounded bg-[#FAF0E6] text-[#C85A32] border border-[#E8DEC0]">
+                              Bab {karya.nomor_bab}
+                            </span>
+                          )}
+                          {karya.nama_cerita && karya.nama_cerita !== karya.judul && (
+                            <span className="text-[11px] text-[#6B625D] font-serif">
+                              Seri: {karya.nama_cerita}
+                            </span>
+                          )}
+                        </div>
+                        <h3 className="text-lg font-serif font-bold text-[#2C2A29]">
+                          <Link
+                            href={`/karya/${karya.id}`}
+                            className="hover:text-[#C85A32] transition"
+                          >
+                            {karya.judul}
+                          </Link>
+                        </h3>
+                      </div>
+
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {/* Tombol Lanjut Bab untuk Novel & Cerbung */}
+                        {isCerita && (
+                          <Link
+                            href={`/tulis?nama_cerita=${encodeURIComponent(seriesName)}&nomor_bab=${nextBabNumber}&kategori=Novel+%26+Cerbung&sinopsis=${encodeURIComponent(karya.sinopsis || '')}`}
+                            className="text-xs text-white bg-[#C85A32] hover:bg-[#A94728] px-3 py-1.5 rounded-xl font-medium shadow-2xs transition inline-flex items-center gap-1.5 shrink-0"
+                            title="Tulis bab selanjutnya dari kisah ini"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                            <span>+ Bab {nextBabNumber}</span>
+                          </Link>
+                        )}
+
+                        {/* Tombol Edit Naskah */}
+                        <Link
+                          href={`/karya/${karya.id}/edit`}
+                          className="text-xs text-[#2C2A29] hover:text-[#C85A32] px-3 py-1.5 rounded-xl bg-[#FAF8F5] border border-[#E8DED6] hover:border-[#C85A32] transition inline-flex items-center gap-1 font-medium"
+                          title="Edit dan perbaiki isi naskah karya ini"
+                        >
+                          <Edit3 className="w-3 h-3" />
+                          <span>Edit</span>
+                        </Link>
+
+                        {/* Tombol Baca */}
                         <Link
                           href={`/karya/${karya.id}`}
-                          className="hover:text-[#C85A32] transition"
+                          className="text-xs text-[#6B625D] hover:text-[#C85A32] px-2.5 py-1.5 rounded-xl bg-[#FAF8F5] border border-[#E8DED6] transition"
+                          title="Lihat naskah di ruang baca"
                         >
-                          {karya.judul}
+                          Baca
                         </Link>
-                      </h3>
-                    </div>
 
-                    <div className="flex items-center gap-2">
-                      <Link
-                        href={`/karya/${karya.id}`}
-                        className="text-xs text-[#C85A32] hover:underline px-2.5 py-1 rounded-lg bg-[#FAF8F5] border border-[#E8DED6]"
-                      >
-                        Baca &rarr;
-                      </Link>
-                      <form action={hapusKarya}>
-                        <input type="hidden" name="karyaId" value={karya.id} />
-                        <button
-                          type="submit"
-                          className="text-xs text-[#6B625D] hover:text-red-700 px-2.5 py-1 rounded-lg hover:bg-red-50 transition cursor-pointer"
-                          title="Hapus karya ini"
-                        >
-                          Hapus
-                        </button>
-                      </form>
+                        <form action={hapusKarya}>
+                          <input type="hidden" name="karyaId" value={karya.id} />
+                          <button
+                            type="submit"
+                            className="text-xs text-[#6B625D] hover:text-red-700 px-2.5 py-1.5 rounded-xl hover:bg-red-50 transition cursor-pointer"
+                            title="Hapus karya ini"
+                          >
+                            Hapus
+                          </button>
+                        </form>
+                      </div>
                     </div>
-                  </div>
 
                   <KaryaSnippetPreview
                     isiTulisan={karya.isi_tulisan || ''}
@@ -602,8 +652,9 @@ export default async function ProfilPage() {
                     </time>
                   </div>
                 </article>
-              ))}
-            </div>
+              );
+            })}
+          </div>
           )}
         </section>
       </main>
