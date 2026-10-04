@@ -1,6 +1,8 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import pool from '../../../lib/db';
 import { getCurrentUser } from '../../../lib/auth-server';
+
+export const dynamic = 'force-dynamic';
 
 const SCHEDULE = [
   { day: 1, xp: 15, reward: '🪶 Tinta Perunggu' },
@@ -12,6 +14,21 @@ const SCHEDULE = [
   { day: 7, xp: 250, reward: '🏆 Piala Maestro Sastra' },
 ];
 
+function getWIBDate(date = new Date()): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Jakarta',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(date);
+}
+
+function getDayDiff(dateStr1: string, dateStr2: string): number {
+  const d1 = new Date(dateStr1 + 'T00:00:00Z').getTime();
+  const d2 = new Date(dateStr2 + 'T00:00:00Z').getTime();
+  return Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+}
+
 export async function GET() {
   try {
     let sessionUser = null;
@@ -19,10 +36,26 @@ export async function GET() {
       sessionUser = await getCurrentUser();
     } catch {}
 
-    const uid = sessionUser?.uid || 'guest_user';
-    const today = new Date().toISOString().slice(0, 10);
+    const uid = sessionUser?.uid;
+    const today = getWIBDate();
 
-    // Ambil data streak
+    if (!uid) {
+      // Guest user (belum login)
+      return NextResponse.json({
+        success: true,
+        user_id: null,
+        streak_count: 0,
+        day: 1,
+        is_claimed_today: false,
+        current_reward: SCHEDULE[0],
+        schedule: SCHEDULE.map((item) => ({
+          ...item,
+          status: item.day === 1 ? 'ready' : 'locked',
+          isCurrent: item.day === 1,
+        })),
+      });
+    }
+
     const { rows } = await pool.query(
       'SELECT * FROM user_streak WHERE user_id = $1',
       [uid]
@@ -30,38 +63,76 @@ export async function GET() {
 
     let streak = rows[0];
 
-    // Sesuai permintaan: mulai dari hari ke-3 saat login
     if (!streak) {
-      const initStreak = await pool.query(
+      // Akun baru pertama kali login: Mulai dari hari 1
+      const initResult = await pool.query(
         `INSERT INTO user_streak (user_id, streak_count, last_active_date, total_hari_aktif, rekor_streak)
-         VALUES ($1, 3, CURRENT_DATE, 3, 7)
-         ON CONFLICT (user_id) DO UPDATE SET streak_count = GREATEST(user_streak.streak_count, 3)
+         VALUES ($1, 1, CURRENT_DATE, 1, 1)
+         ON CONFLICT (user_id) DO UPDATE SET last_active_date = CURRENT_DATE
          RETURNING *`,
         [uid]
       );
-      streak = initStreak.rows[0] || {
+      streak = initResult.rows[0] || {
         user_id: uid,
-        streak_count: 3,
+        streak_count: 1,
         last_active_date: today,
-        total_hari_aktif: 3,
-        rekor_streak: 7,
+        total_hari_aktif: 1,
+        rekor_streak: 1,
       };
-    } else if (streak.streak_count < 3) {
-      await pool.query(
-        'UPDATE user_streak SET streak_count = 3 WHERE user_id = $1',
-        [uid]
-      );
-      streak.streak_count = 3;
+    } else {
+      const lastActive = streak.last_active_date
+        ? getWIBDate(new Date(streak.last_active_date))
+        : null;
+
+      const diff = lastActive ? getDayDiff(lastActive, today) : 999;
+
+      if (diff === 1) {
+        // Login berturut-turut di hari berikutnya: tambah streak!
+        const newStreak = (Number(streak.streak_count) || 0) + 1;
+        const newTotalAktif = (Number(streak.total_hari_aktif) || 0) + 1;
+        const newRekor = Math.max(Number(streak.rekor_streak) || 1, newStreak);
+
+        await pool.query(
+          `UPDATE user_streak
+           SET streak_count = $1,
+               last_active_date = CURRENT_DATE,
+               total_hari_aktif = $2,
+               rekor_streak = $3
+           WHERE user_id = $4`,
+          [newStreak, newTotalAktif, newRekor, uid]
+        );
+
+        streak.streak_count = newStreak;
+        streak.last_active_date = today;
+        streak.total_hari_aktif = newTotalAktif;
+        streak.rekor_streak = newRekor;
+      } else if (diff > 1) {
+        // Terlewat lebih dari 1 hari: streak reset ke 1
+        const newTotalAktif = (Number(streak.total_hari_aktif) || 0) + 1;
+        await pool.query(
+          `UPDATE user_streak
+           SET streak_count = 1,
+               last_active_date = CURRENT_DATE,
+               total_hari_aktif = $1
+           WHERE user_id = $2`,
+          [newTotalAktif, uid]
+        );
+
+        streak.streak_count = 1;
+        streak.last_active_date = today;
+        streak.total_hari_aktif = newTotalAktif;
+      }
+      // Jika diff === 0 (hari yang sama), streak tetap sama
     }
 
-    const currentCount = streak.streak_count || 3;
-    const currentDay = ((currentCount - 1) % 7) + 1; // 1-7
+    const currentCount = Number(streak.streak_count) || 1;
+    const currentDay = ((currentCount - 1) % 7) + 1; // Putaran 1-7
     const lastClaimed = streak.last_bonus_claimed_date
-      ? new Date(streak.last_bonus_claimed_date).toISOString().slice(0, 10)
+      ? getWIBDate(new Date(streak.last_bonus_claimed_date))
       : null;
     const isClaimedToday = lastClaimed === today;
 
-    const currentReward = SCHEDULE.find((s) => s.day === currentDay) || SCHEDULE[2];
+    const currentReward = SCHEDULE.find((s) => s.day === currentDay) || SCHEDULE[0];
 
     const scheduleWithStatus = SCHEDULE.map((item) => {
       let status: 'claimed' | 'ready' | 'locked' = 'locked';
@@ -88,17 +159,16 @@ export async function GET() {
     });
   } catch (err) {
     console.warn('[Login Beruntung API] Error GET:', err);
-    // Fallback elegan hari ke-3
     return NextResponse.json({
       success: true,
-      streak_count: 3,
-      day: 3,
+      streak_count: 1,
+      day: 1,
       is_claimed_today: false,
-      current_reward: SCHEDULE[2],
+      current_reward: SCHEDULE[0],
       schedule: SCHEDULE.map((s) => ({
         ...s,
-        status: s.day < 3 ? 'claimed' : s.day === 3 ? 'ready' : 'locked',
-        isCurrent: s.day === 3,
+        status: s.day === 1 ? 'ready' : 'locked',
+        isCurrent: s.day === 1,
       })),
     });
   }
@@ -111,10 +181,16 @@ export async function POST() {
       sessionUser = await getCurrentUser();
     } catch {}
 
-    const uid = sessionUser?.uid || 'guest_user';
-    const today = new Date().toISOString().slice(0, 10);
+    const uid = sessionUser?.uid;
+    if (!uid) {
+      return NextResponse.json(
+        { error: 'Silakan masuk terlebih dahulu untuk mengklaim bonus harian.' },
+        { status: 401 }
+      );
+    }
 
-    // Ambil data streak
+    const today = getWIBDate();
+
     const { rows } = await pool.query(
       'SELECT * FROM user_streak WHERE user_id = $1',
       [uid]
@@ -122,31 +198,29 @@ export async function POST() {
 
     let streak = rows[0];
     if (!streak) {
-      const initStreak = await pool.query(
+      const initResult = await pool.query(
         `INSERT INTO user_streak (user_id, streak_count, last_active_date, total_hari_aktif, rekor_streak)
-         VALUES ($1, 3, CURRENT_DATE, 3, 7)
+         VALUES ($1, 1, CURRENT_DATE, 1, 1)
          RETURNING *`,
         [uid]
       );
-      streak = initStreak.rows[0];
-    } else if (streak.streak_count < 3) {
-      streak.streak_count = 3;
+      streak = initResult.rows[0];
     }
 
-    const currentCount = streak.streak_count || 3;
+    const currentCount = Number(streak.streak_count) || 1;
     const currentDay = ((currentCount - 1) % 7) + 1;
     const lastClaimed = streak.last_bonus_claimed_date
-      ? new Date(streak.last_bonus_claimed_date).toISOString().slice(0, 10)
+      ? getWIBDate(new Date(streak.last_bonus_claimed_date))
       : null;
 
     if (lastClaimed === today) {
       return NextResponse.json(
-        { error: 'Bonus login hari ini sudah diklaim. Datang kembali besok!' },
+        { error: 'Bonus login hari ini sudah Anda klaim. Datang kembali besok!' },
         { status: 400 }
       );
     }
 
-    const reward = SCHEDULE.find((s) => s.day === currentDay) || SCHEDULE[2];
+    const reward = SCHEDULE.find((s) => s.day === currentDay) || SCHEDULE[0];
     const bonusXp = reward.xp;
 
     // 1. Tambah XP ke user_gamification
@@ -157,28 +231,25 @@ export async function POST() {
       [uid, bonusXp]
     );
 
-    // 2. Catat riwayat XP
+    // 2. Catat ke xp_history
     try {
       await pool.query(
         `INSERT INTO xp_history (user_id, jumlah_xp, jenis, keterangan)
          VALUES ($1, $2, 'login_beruntung', $3)`,
-        [uid, bonusXp, `Klaim Hadiah Login Beruntung Hari ke-${currentDay} (${reward.reward})`]
+        [uid, bonusXp, `Hadiah Login Beruntung Hari ke-${currentDay} (${reward.reward})`]
       );
-    } catch {
-      // Abaikan jika tabel xp_history belum ada
-    }
+    } catch {}
 
-    // 3. Update user_streak
+    // 3. Update tanggal klaim bonus terakhir
     await pool.query(
       `UPDATE user_streak
        SET last_bonus_claimed_date = CURRENT_DATE,
-           last_active_date = CURRENT_DATE,
-           streak_count = GREATEST(streak_count, 3)
+           last_active_date = CURRENT_DATE
        WHERE user_id = $1`,
       [uid]
     );
 
-    // Ambil XP terbaru
+    // Ambil total XP terbaru
     const gamifResult = await pool.query(
       'SELECT xp FROM user_gamification WHERE user_id = $1',
       [uid]
@@ -197,7 +268,7 @@ export async function POST() {
   } catch (err) {
     console.error('[Login Beruntung API] Error POST:', err);
     return NextResponse.json(
-      { error: 'Gagal mengklaim bonus harian' },
+      { error: 'Gagal mengklaim bonus harian.' },
       { status: 500 }
     );
   }

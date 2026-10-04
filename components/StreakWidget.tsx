@@ -1,7 +1,7 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect } from 'react';
-import { Flame, Gift, Check, ChevronRight, X, Sparkles, Loader2, Award, BookOpen, Feather } from 'lucide-react';
+import { Flame, Gift, Check, ChevronRight, X, Sparkles, Loader2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 interface ScheduleItem {
@@ -24,24 +24,24 @@ interface LoginBeruntungData {
   schedule: ScheduleItem[];
 }
 
-export default function StreakWidget({ initialCount = 3 }: { initialCount?: number }) {
+export default function StreakWidget({ initialCount = 1 }: { initialCount?: number }) {
   const [data, setData] = useState<LoginBeruntungData>({
-    streak_count: Math.max(initialCount, 3),
-    day: 3,
+    streak_count: Math.max(initialCount || 1, 1),
+    day: 1,
     is_claimed_today: false,
     current_reward: {
-      day: 3,
-      xp: 40,
-      reward: 'Bonus Pena Nyala',
+      day: 1,
+      xp: 15,
+      reward: '🪶 Tinta Perunggu',
     },
     schedule: [
-      { day: 1, xp: 15, reward: 'Tinta Perunggu', status: 'claimed', isCurrent: false },
-      { day: 2, xp: 25, reward: 'Inspirasi Aksara', status: 'claimed', isCurrent: false },
-      { day: 3, xp: 40, reward: 'Bonus Pena Nyala', status: 'ready', isCurrent: true },
-      { day: 4, xp: 60, reward: 'Gulungan Puisi', status: 'locked', isCurrent: false },
-      { day: 5, xp: 85, reward: 'Aksara Perak', status: 'locked', isCurrent: false },
-      { day: 6, xp: 120, reward: 'Apresiasi Redaksi', status: 'locked', isCurrent: false },
-      { day: 7, xp: 250, reward: 'Lencana Maestro', status: 'locked', isCurrent: false },
+      { day: 1, xp: 15, reward: '🪶 Tinta Perunggu', status: 'ready', isCurrent: true },
+      { day: 2, xp: 25, reward: '📜 Inspirasi Aksara', status: 'locked', isCurrent: false },
+      { day: 3, xp: 40, reward: '🔥 Bonus Pena Nyala', status: 'locked', isCurrent: false },
+      { day: 4, xp: 60, reward: '📖 Gulungan Puisi', status: 'locked', isCurrent: false },
+      { day: 5, xp: 85, reward: '✨ Aksara Perak', status: 'locked', isCurrent: false },
+      { day: 6, xp: 120, reward: '🌟 Apresiasi Redaksi', status: 'locked', isCurrent: false },
+      { day: 7, xp: 250, reward: '🏆 Piala Maestro Sastra', status: 'locked', isCurrent: false },
     ],
   });
 
@@ -58,13 +58,13 @@ export default function StreakWidget({ initialCount = 3 }: { initialCount?: numb
           const json = await res.json();
           if (json.success) {
             setData({
-              streak_count: Math.max(json.streak_count || 3, 3),
-              day: json.day || 3,
+              streak_count: Math.max(Number(json.streak_count) || 1, 1),
+              day: Number(json.day) || 1,
               is_claimed_today: !!json.is_claimed_today,
               current_reward: json.current_reward || {
-                day: 3,
-                xp: 40,
-                reward: 'Bonus Pena Nyala',
+                day: 1,
+                xp: 15,
+                reward: '🪶 Tinta Perunggu',
               },
               schedule: json.schedule || [],
             });
@@ -121,7 +121,7 @@ export default function StreakWidget({ initialCount = 3 }: { initialCount?: numb
   };
 
   const count = data.streak_count;
-  let streakTitle = 'Pena Nyala';
+  let streakTitle = 'Langkah Awal';
 
   if (count >= 30) {
     streakTitle = 'Sang Maestro Aksara';
@@ -129,15 +129,17 @@ export default function StreakWidget({ initialCount = 3 }: { initialCount?: numb
     streakTitle = 'Pujangga Tekun';
   } else if (count >= 7) {
     streakTitle = 'Pena Tak Padam';
+  } else if (count >= 3) {
+    streakTitle = 'Pena Nyala';
   }
 
   return (
     <>
-      <div className="bg-[#FFFDF9] rounded-2xl p-5 border border-[#E8DED6] shadow-2xs mb-8 space-y-4">
+      <div className="bg-[#FFFDF9] rounded-2xl p-5 border border-[#DFCFC1] shadow-2xs mb-8 space-y-4">
         {/* Status Streak */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="relative w-12 h-12 rounded-2xl bg-[#FAF8F5] border border-[#E8DED6] flex items-center justify-center shadow-2xs shrink-0">
+            <div className="relative w-12 h-12 rounded-2xl bg-[#FAF8F5] border border-[#DFCFC1] flex items-center justify-center shadow-2xs shrink-0">
               <Flame className="w-6 h-6 text-[#C85A32]" />
               <span className="absolute -bottom-1 -right-1 bg-[#C85A32] text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full shadow-2xs">
                 {count}d
@@ -146,15 +148,15 @@ export default function StreakWidget({ initialCount = 3 }: { initialCount?: numb
 
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-serif font-bold text-base text-[#2C2A29]">
+                <h3 className="font-serif font-bold text-base text-[#1A1817]">
                   {count} Hari Berturut-turut
                 </h3>
-                <span className="text-[10px] uppercase font-semibold tracking-wider px-2 py-0.5 rounded-lg border border-[#E8DED6] bg-[#FAF8F5] text-[#C85A32]">
+                <span className="text-[10px] uppercase font-semibold tracking-wider px-2 py-0.5 rounded-lg border border-[#DFCFC1] bg-[#FAF8F5] text-[#C85A32]">
                   {streakTitle}
                 </span>
               </div>
 
-              <p className="text-xs text-[#6B625D] mt-0.5">
+              <p className="text-xs text-[#5C544F] mt-0.5">
                 {data.is_claimed_today
                   ? 'Pena Tak Padam! Bonus login hari ini sudah masuk ke akun Anda.'
                   : 'Hadiah Login Beruntung siap Anda klaim hari ini.'}
@@ -174,7 +176,7 @@ export default function StreakWidget({ initialCount = 3 }: { initialCount?: numb
                 ) : (
                   <Gift className="w-3.5 h-3.5" />
                 )}
-                <span>Klaim +{data.current_reward?.xp || 40} XP</span>
+                <span>Klaim +{data.current_reward?.xp || 15} XP</span>
               </button>
             ) : (
               <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#7A8B68]/10 text-[#7A8B68] text-xs font-medium rounded-xl border border-[#7A8B68]/30">
@@ -185,7 +187,7 @@ export default function StreakWidget({ initialCount = 3 }: { initialCount?: numb
 
             <button
               onClick={() => setShowModal(true)}
-              className="px-3 py-2 bg-[#FAF8F5] hover:bg-white border border-[#E8DED6] text-[#6B625D] rounded-xl text-xs font-medium transition cursor-pointer flex items-center gap-1 shadow-2xs"
+              className="px-3 py-2 bg-[#FAF8F5] hover:bg-white border border-[#DFCFC1] text-[#5C544F] rounded-xl text-xs font-medium transition cursor-pointer flex items-center gap-1 shadow-2xs"
               title="Lihat Jadwal Hadiah 7 Hari"
             >
               <span>Jadwal Bonus</span>
@@ -195,8 +197,8 @@ export default function StreakWidget({ initialCount = 3 }: { initialCount?: numb
         </div>
 
         {/* Banner Mini */}
-        <div className="bg-[#FAF8F5] border border-[#E8DED6] rounded-xl p-3 flex items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2 text-[#6B625D]">
+        <div className="bg-[#FAF8F5] border border-[#DFCFC1] rounded-xl p-3 flex items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2 text-[#5C544F]">
             <Sparkles className="w-4 h-4 text-[#C85A32] shrink-0" />
             <span>
               <strong>Login Beruntung:</strong> Pertahankan streak membaca &amp; menulis agar penamu tak padam.
@@ -214,17 +216,17 @@ export default function StreakWidget({ initialCount = 3 }: { initialCount?: numb
       {/* Modal Kalender 7 Hari */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-xs p-4">
-          <div className="w-full max-w-md rounded-2xl bg-[#FFFDF9] p-6 shadow-xl border border-[#E8DED6] space-y-4 animate-in fade-in zoom-in-95 duration-150">
-            <div className="flex items-center justify-between border-b border-[#E8DED6] pb-3">
+          <div className="w-full max-w-md rounded-2xl bg-[#FFFDF8] p-6 shadow-xl border border-[#DFCFC1] space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-[#DFCFC1] pb-3">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-xl bg-[#C85A32]/10 text-[#C85A32] flex items-center justify-center border border-[#C85A32]/20">
                   <Gift className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-serif font-bold text-base text-[#2C2A29]">
+                  <h3 className="font-serif font-bold text-base text-[#1A1817]">
                     Hadiah Login Beruntung
                   </h3>
-                  <p className="text-xs text-[#6B625D]">
+                  <p className="text-xs text-[#5C544F]">
                     Klaim bonus setiap hari untuk tingkatkan XP sastramu!
                   </p>
                 </div>
@@ -234,7 +236,7 @@ export default function StreakWidget({ initialCount = 3 }: { initialCount?: numb
                   setShowModal(false);
                   setClaimSuccessMessage(null);
                 }}
-                className="text-[#6B625D] hover:text-[#2C2A29] p-1.5 rounded-lg cursor-pointer"
+                className="text-[#5C544F] hover:text-[#1A1817] p-1.5 rounded-lg cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -260,20 +262,20 @@ export default function StreakWidget({ initialCount = 3 }: { initialCount?: numb
                       item.day === 7 ? 'col-span-2 sm:col-span-2 bg-[#FAF8F5] border-[#C85A32]/40' : ''
                     } ${
                       isReady
-                        ? 'bg-[#FFFDF9] border-[#C85A32] ring-1 ring-[#C85A32]'
+                        ? 'bg-[#FFFDF8] border-[#C85A32] ring-1 ring-[#C85A32]'
                         : isClaimed
-                        ? 'bg-[#FAF8F5] border-[#E8DED6] opacity-80'
-                        : 'bg-[#FFFDF9] border-[#E8DED6]'
+                        ? 'bg-[#FAF8F5] border-[#DFCFC1] opacity-75'
+                        : 'bg-[#FFFDF8] border-[#DFCFC1]'
                     }`}
                   >
                     <div>
-                      <span className="text-[10px] text-[#6B625D] font-semibold block uppercase tracking-wider">
+                      <span className="text-[10px] text-[#5C544F] font-semibold block uppercase tracking-wider">
                         Hari ke-{item.day}
                       </span>
-                      <p className="text-xs font-bold text-[#2C2A29] mt-0.5">
+                      <p className="text-xs font-bold text-[#1A1817] mt-0.5">
                         +{item.xp} XP
                       </p>
-                      <p className="text-[11px] text-[#6B625D] mt-1 line-clamp-2 leading-tight">
+                      <p className="text-[11px] text-[#5C544F] mt-1 line-clamp-2 leading-tight">
                         {item.reward}
                       </p>
                     </div>
@@ -289,10 +291,10 @@ export default function StreakWidget({ initialCount = 3 }: { initialCount?: numb
                           disabled={isClaiming}
                           className="w-full py-1 bg-[#C85A32] hover:bg-[#A94728] text-white text-[11px] font-semibold rounded-lg transition cursor-pointer"
                         >
-                          {isClaiming ? 'Mengambil...' : 'Klaim'}
+                          {isClaiming ? '...' : 'Klaim'}
                         </button>
                       ) : (
-                        <span className="text-[10px] text-[#6B625D]/60 bg-[#FAF8F5] px-2 py-0.5 rounded-md">
+                        <span className="text-[10px] text-[#5C544F]/60 bg-[#FAF8F5] px-2 py-0.5 rounded-md">
                           Terkunci
                         </span>
                       )}
@@ -300,18 +302,6 @@ export default function StreakWidget({ initialCount = 3 }: { initialCount?: numb
                   </div>
                 );
               })}
-            </div>
-
-            <div className="pt-2">
-              <button
-                onClick={() => {
-                  setShowModal(false);
-                  setClaimSuccessMessage(null);
-                }}
-                className="w-full py-2.5 bg-[#FAF8F5] hover:bg-[#E8DED6] border border-[#E8DED6] text-[#2C2A29] rounded-xl text-xs font-medium transition cursor-pointer"
-              >
-                Tutup
-              </button>
             </div>
           </div>
         </div>
