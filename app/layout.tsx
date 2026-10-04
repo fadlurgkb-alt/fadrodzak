@@ -25,7 +25,7 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-const SITE_URL = 'https://fadrodzak.my.id';
+const SITE_URL = 'https://www.fadrodzak.my.id';
 const SITE_NAME = 'Fadrodzak';
 const DEFAULT_TITLE = 'Fadrodzak — Ruang Sastra & Komunitas Aksara';
 const DEFAULT_DESCRIPTION =
@@ -111,7 +111,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+    google: 'OiNGLZr5-O0FZj437aNovYuw2_j76dL-IQk4nnJqcm4',
   },
 };
 
@@ -154,6 +154,10 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${cormorant.variable} ${inter.variable}`}>
       <head>
+        <meta
+          name="google-site-verification"
+          content="OiNGLZr5-O0FZj437aNovYuw2_j76dL-IQk4nnJqcm4"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGlobal) }}

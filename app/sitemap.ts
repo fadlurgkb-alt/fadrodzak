@@ -1,4 +1,4 @@
-﻿import type { MetadataRoute } from 'next';
+import type { MetadataRoute } from 'next';
 import pool from '../lib/db';
 
 const BASE_URL = 'https://www.fadrodzak.my.id';
