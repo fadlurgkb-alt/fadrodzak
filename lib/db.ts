@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+﻿/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Pool } from 'pg';
 import fs from 'fs';
 import path from 'path';
@@ -242,7 +242,7 @@ const initialKaryas: KaryaItem[] = [
   },
   {
     id: 4,
-    judul: 'Gadis Penenun Benang Emas — Bab 1: Kilau Benang Perak di Kaki Gunung',
+    judul: 'Gadis Penenun Benang Emas â€” Bab 1: Kilau Benang Perak di Kaki Gunung',
     kategori: 'Novel & Cerbung',
     nomor_bab: 1,
     judul_bab: 'Bab 1: Kilau Benang Perak di Kaki Gunung',
@@ -262,7 +262,7 @@ const initialKaryas: KaryaItem[] = [
   },
   {
     id: 6,
-    judul: 'Gadis Penenun Benang Emas — Bab 2: Tamu dari Lembah Kabut',
+    judul: 'Gadis Penenun Benang Emas â€” Bab 2: Tamu dari Lembah Kabut',
     kategori: 'Novel & Cerbung',
     nomor_bab: 2,
     judul_bab: 'Bab 2: Tamu dari Lembah Kabut',
@@ -270,7 +270,7 @@ const initialKaryas: KaryaItem[] = [
     sinopsis: 'Rengganis mewarisi alat tenun ramalan di perbatasan hutan keramat. Setiap kain yang ia sulam menyimpan ramalan masa depan, hingga seorang pengelana terluka mengetuk pintunya di malam badai.',
     genre: 'Fantasi',
     status_cerita: 'Ongoing',
-    isi_tulisan: `Pintu kayu berderit pelan saat Rengganis mengangkat palang pengunci. Udara lembap bercampur aroma tembaga menusuk hidungnya seketika.\n\nDi ambang pintu, seorang pemuda tersungkur. Jemari tangannya menggenggam sebilah belati berukir lambang rajawali perak—lambang kesatria istana timur yang telah lama musnah dari ingatan penduduk desa.\n\n"Tolong... jangan biarkan mereka mengambil gulungan sutra biru," bisik pemuda itu parau sebelum jatuh tak sadarkan diri di atas lantai papan.\n\nRengganis tertegun. Di dada pemuda itu, darah merembes membasahi kain tenun berwarna biru laut—persis seperti sehelai kain yang baru saja selesai ia tenun tadi sore.`,
+    isi_tulisan: `Pintu kayu berderit pelan saat Rengganis mengangkat palang pengunci. Udara lembap bercampur aroma tembaga menusuk hidungnya seketika.\n\nDi ambang pintu, seorang pemuda tersungkur. Jemari tangannya menggenggam sebilah belati berukir lambang rajawali perakâ€”lambang kesatria istana timur yang telah lama musnah dari ingatan penduduk desa.\n\n"Tolong... jangan biarkan mereka mengambil gulungan sutra biru," bisik pemuda itu parau sebelum jatuh tak sadarkan diri di atas lantai papan.\n\nRengganis tertegun. Di dada pemuda itu, darah merembes membasahi kain tenun berwarna biru lautâ€”persis seperti sehelai kain yang baru saja selesai ia tenun tadi sore.`,
     nama_pengguna: 'Rengganis Aksara',
     status_penulis: 'Novelis Muda',
     link_trakteer: 'https://trakteer.id/fadrodzak/tip',
@@ -282,7 +282,7 @@ const initialKaryas: KaryaItem[] = [
   },
   {
     id: 5,
-    judul: 'Melodi di Ujung Senja — Bab 1: Kereta Api Senja Utama',
+    judul: 'Melodi di Ujung Senja â€” Bab 1: Kereta Api Senja Utama',
     kategori: 'Novel & Cerbung',
     nomor_bab: 1,
     judul_bab: 'Bab 1: Kereta Api Senja Utama',
@@ -302,7 +302,7 @@ const initialKaryas: KaryaItem[] = [
   },
   {
     id: 7,
-    judul: 'Melodi di Ujung Senja — Bab 2: Kopi Hangat dan Nada yang Hilang',
+    judul: 'Melodi di Ujung Senja â€” Bab 2: Kopi Hangat dan Nada yang Hilang',
     kategori: 'Novel & Cerbung',
     nomor_bab: 2,
     judul_bab: 'Bab 2: Kopi Hangat dan Nada yang Hilang',
@@ -386,10 +386,10 @@ const initialBuku: BukuItem[] = [
 ];
 
 const initialBadges: BadgeItem[] = [
-  { id: 1, kode: 'tinta_pertama', nama: 'Tinta Pertama', deskripsi: 'Menerbitkan karya sastra pertama di platform', icon: '✒️', rarity: 'common' },
-  { id: 2, kode: 'penyair_muda', nama: 'Penyair Muda', deskripsi: 'Mempublikasikan 3 karya puisi', icon: '📜', rarity: 'rare' },
-  { id: 3, kode: 'pembaca_setia', nama: 'Pembaca Setia', deskripsi: 'Aktif mengulas dan memberi tanggapan', icon: '📖', rarity: 'common' },
-  { id: 4, kode: 'sastrawan', nama: 'Sastrawan Pilihan', deskripsi: 'Karya terpilih dalam kurasi redaksi', icon: '👑', rarity: 'epic' },
+  { id: 1, kode: 'tinta_pertama', nama: 'Tinta Pertama', deskripsi: 'Menerbitkan karya sastra pertama di platform', icon: 'âœ’ï¸', rarity: 'common' },
+  { id: 2, kode: 'penyair_muda', nama: 'Penyair Muda', deskripsi: 'Mempublikasikan 3 karya puisi', icon: 'ðŸ“œ', rarity: 'rare' },
+  { id: 3, kode: 'pembaca_setia', nama: 'Pembaca Setia', deskripsi: 'Aktif mengulas dan memberi tanggapan', icon: 'ðŸ“–', rarity: 'common' },
+  { id: 4, kode: 'sastrawan', nama: 'Sastrawan Pilihan', deskripsi: 'Karya terpilih dalam kurasi redaksi', icon: 'ðŸ‘‘', rarity: 'epic' },
 ];
 
 const initialUserBadges: UserBadgeItem[] = [
@@ -409,9 +409,9 @@ const initialLikes: LikeItem[] = [
 ];
 
 const initialNotifikasi: NotifikasiItem[] = [
-  { id: 1, tipe: 'reaksi', pesan: 'Seseorang menitipkan apresiasi "🍂 Tersentuh" pada bait puisimu.', created_at: new Date(Date.now() - 3600 * 1000 * 1) },
+  { id: 1, tipe: 'reaksi', pesan: 'Seseorang menitipkan apresiasi "ðŸ‚ Tersentuh" pada bait puisimu.', created_at: new Date(Date.now() - 3600 * 1000 * 1) },
   { id: 2, tipe: 'komentar', pesan: 'Dra. Siti Wardani memberikan telaah di tafsir bait ke-2 karyamu.', created_at: new Date(Date.now() - 3600 * 1000 * 3) },
-  { id: 3, tipe: 'streak', pesan: 'Pena Tak Padam: Streak membacamu mencapai 3 hari berturut-turut! 🔥', created_at: new Date(Date.now() - 3600 * 1000 * 5) },
+  { id: 3, tipe: 'streak', pesan: 'Pena Tak Padam: Streak membacamu mencapai 3 hari berturut-turut! ðŸ”¥', created_at: new Date(Date.now() - 3600 * 1000 * 5) },
 ];
 
 const initialReaksi: ReaksiSastraItem[] = [
@@ -1092,7 +1092,7 @@ async function runMemoryQuery(text: string, params: any[] = []): Promise<{ rows:
         kode: 'badge',
         nama: 'Aksara',
         deskripsi: '',
-        icon: '⭐',
+        icon: 'â­',
         rarity: 'common',
       };
       return {
@@ -1515,7 +1515,7 @@ function getPool(): Pool | null {
       connectionString: databaseUrl,
       max: 5,
       idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 10000,
+      connectionTimeoutMillis: 2000,
     };
 
     // Nonaktifkan SSL hanya untuk database lokal tanpa parameter sslmode
