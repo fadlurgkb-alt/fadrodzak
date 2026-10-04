@@ -3,6 +3,7 @@
 import { Conversation } from '@/lib/chat-server';
 import Link from 'next/link';
 import { User, MessageSquare } from 'lucide-react';
+import { formatWaktuRelatif } from '@/lib/date';
 
 interface ChatListProps {
   conversations: Conversation[];
@@ -45,12 +46,7 @@ export default function ChatList({ conversations, onNewChatClick }: ChatListProp
       ) : (
         <div className="space-y-3">
           {conversations.map((c) => {
-            const timeStr = c.last_message_at
-              ? new Date(c.last_message_at).toLocaleDateString('id-ID', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })
-              : '';
+            const timeStr = c.last_message_at ? formatWaktuRelatif(c.last_message_at) : '';
 
             return (
               <Link
@@ -64,6 +60,8 @@ export default function ChatList({ conversations, onNewChatClick }: ChatListProp
                     <img
                       src={c.other_user_foto}
                       alt={c.other_user_name || 'User'}
+                      loading="lazy"
+                      decoding="async"
                       className="w-12 h-12 rounded-full object-cover border border-amber-900/20 shrink-0"
                       referrerPolicy="no-referrer"
                     />

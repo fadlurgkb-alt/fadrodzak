@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import confetti from 'canvas-confetti';
 import { Feather, Flame, Coffee, Sparkles } from 'lucide-react';
+import { showToast } from './Toast';
 
 export type ReaksiTipe = 'tersentuh' | 'membakar' | 'hangat' | 'memukau';
 
@@ -80,6 +81,9 @@ export default function ApresiasiMikro({
       ...prev,
       [tipe]: prev[tipe] + 1,
     }));
+
+    const label = daftarReaksi.find((r) => r.tipe === tipe)?.label || 'sastra';
+    showToast(`Apresiasi "${label}" tersampaikan!`, 'success');
 
     if (onReactAction) {
       startTransition(async () => {

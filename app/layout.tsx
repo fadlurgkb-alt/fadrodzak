@@ -1,9 +1,10 @@
-﻿import './globals.css';
+import './globals.css';
 import type { Metadata, Viewport } from 'next';
 import { Cormorant_Garamond, Inter } from 'next/font/google';
 import BottomNav from '../components/BottomNav';
 import DoveChatBubble from '../components/DoveChatBubble';
 import Footer from '../components/Footer';
+import Toast from '../components/Toast';
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -171,6 +172,8 @@ export default function RootLayout({
         <DoveChatBubble />
         {/* Navigasi Bawah */}
         <BottomNav />
+        {/* Notifikasi Toast Elegan */}
+        <Toast />
       </body>
     </html>
   );

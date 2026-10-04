@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Message } from '@/lib/chat-server';
 import { Send, ArrowLeft, ShieldAlert, CheckCircle2, User, Loader2, MoreVertical } from 'lucide-react';
 import Link from 'next/link';
+import { formatJamMenit } from '@/lib/date';
 
 interface ChatWindowProps {
   conversationId: number;
@@ -141,6 +142,8 @@ export default function ChatWindow({
             <img
               src={otherUser.foto_url}
               alt={otherUser.nama}
+              loading="lazy"
+              decoding="async"
               className="w-10 h-10 rounded-full object-cover border border-amber-900/20"
               referrerPolicy="no-referrer"
             />
@@ -194,10 +197,7 @@ export default function ChatWindow({
         ) : (
           messages.map((m) => {
             const isMe = m.sender_user_id === currentUserId;
-            const timeStr = new Date(m.created_at).toLocaleTimeString('id-ID', {
-              hour: '2-digit',
-              minute: '2-digit',
-            });
+            const timeStr = formatJamMenit(m.created_at);
 
             return (
               <div key={m.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>

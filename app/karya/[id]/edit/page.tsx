@@ -107,7 +107,11 @@ export default async function EditKaryaPage({
 
     const gambar = formData.get('gambar');
     let gambarUrl = karya.gambar_url;
+    const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
     if (gambar instanceof File && gambar.size > 0) {
+      if (gambar.size > MAX_IMAGE_SIZE) {
+        redirect(`/karya/${karyaId}/edit?error=Ukuran+gambar+sampul+maksimal+2MB`);
+      }
       try {
         const buffer = Buffer.from(await gambar.arrayBuffer());
         gambarUrl = `data:${gambar.type || 'image/jpeg'};base64,${buffer.toString('base64')}`;

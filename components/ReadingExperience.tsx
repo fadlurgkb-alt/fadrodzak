@@ -31,6 +31,7 @@ import { isBookmarked, toggleBookmark, updateReadingProgress } from '../lib/book
 import ApresiasiMikro, { ReaksiTipe } from './ApresiasiMikro';
 import TafsirBaitSection, { TafsirItem } from './TafsirBaitSection';
 import { formatWaktuRelatif, formatWaktuLengkap } from '../lib/date';
+import { showToast } from './Toast';
 
 export interface ChapterItem {
   id: number;
@@ -135,6 +136,7 @@ export default function ReadingExperience({
       url: `/karya/${karyaId}`,
     });
     setBookmarked(res);
+    showToast(res ? 'Tersimpan di rak bacaan' : 'Dihapus dari rak bacaan', 'info');
   };
 
   // 2. Ambient Sound State

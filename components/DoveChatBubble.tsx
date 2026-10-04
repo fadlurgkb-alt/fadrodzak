@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { formatJamMenit, formatWaktuRelatif } from '@/lib/date';
 
 interface SearchUserItem {
   user_id: string;
@@ -384,10 +385,7 @@ export default function DoveChatBubble() {
                   <div className="space-y-2 flex-1">
                     {messages.map((m) => {
                       const isMe = m.sender_user_id === currentUserId;
-                      const timeStr = new Date(m.created_at).toLocaleTimeString('id-ID', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      });
+                      const timeStr = formatJamMenit(m.created_at);
 
                       return (
                         <div
@@ -511,10 +509,7 @@ export default function DoveChatBubble() {
                   <div className="space-y-2">
                     {conversations.map((c) => {
                       const timeStr = c.last_message_at
-                        ? new Date(c.last_message_at).toLocaleTimeString('id-ID', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })
+                        ? formatWaktuRelatif(c.last_message_at)
                         : '';
 
                       return (
@@ -528,6 +523,8 @@ export default function DoveChatBubble() {
                             <img
                               src={c.other_user_foto}
                               alt={c.other_user_name || 'Penulis'}
+                              loading="lazy"
+                              decoding="async"
                               className="w-10 h-10 rounded-full object-cover shrink-0 border border-[#E8DED6]"
                             />
                           ) : (

@@ -2,6 +2,7 @@ import pool from '../../../lib/db';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
 import ReadingExperience from '../../../components/ReadingExperience';
 import NovelShowcaseCard from '../../../components/NovelShowcaseCard';
 import { ReaksiTipe } from '../../../components/ApresiasiMikro';
@@ -83,6 +84,13 @@ async function tambahApresiasiAction(karyaId: number, tipe: ReaksiTipe) {
   'use server';
   if (!Number.isInteger(karyaId) || karyaId <= 0) return;
 
+  const cookieStore = await cookies();
+  const reactedCookie = cookieStore.get(`fadrodzak_reaksi_${karyaId}`)?.value;
+  if (reactedCookie === tipe) {
+    // Pengguna baru saja memberi reaksi yang sama persis
+    return;
+  }
+
   let sessionUser = null;
   try {
     sessionUser = await getCurrentUser();
@@ -106,6 +114,13 @@ async function tambahApresiasiAction(karyaId: number, tipe: ReaksiTipe) {
     [karyaId]
   );
 
+  cookieStore.set(`fadrodzak_reaksi_${karyaId}`, tipe, {
+    maxAge: 60 * 60 * 6, // 6 jam cooldown untuk reaksi yang sama
+    path: '/',
+    httpOnly: true,
+    sameSite: 'lax',
+  });
+
   revalidatePath('/');
   revalidatePath(`/karya/${karyaId}`);
   revalidatePath('/profil');
@@ -115,6 +130,14 @@ async function tambahLikeAction(formData: FormData) {
   'use server';
   const karyaId = Number(formData.get('karyaId'));
   if (!Number.isInteger(karyaId) || karyaId <= 0) return;
+
+  const cookieStore = await cookies();
+  const likedCookie = cookieStore.get('fadrodzak_liked_karyas')?.value || '';
+  const likedList = likedCookie ? likedCookie.split(',') : [];
+  if (likedList.includes(String(karyaId))) {
+    // Karya ini sudah pernah disukai oleh sesi pengguna saat ini
+    return;
+  }
 
   let sessionUser = null;
   try {
@@ -132,6 +155,14 @@ async function tambahLikeAction(formData: FormData) {
     'UPDATE karya SET jumlah_suka = COALESCE(jumlah_suka, 0) + 1 WHERE id = $1',
     [karyaId]
   );
+
+  likedList.push(String(karyaId));
+  cookieStore.set('fadrodzak_liked_karyas', likedList.slice(-200).join(','), {
+    maxAge: 60 * 60 * 24 * 30, // 30 hari
+    path: '/',
+    httpOnly: true,
+    sameSite: 'lax',
+  });
 
   revalidatePath('/');
   revalidatePath(`/karya/${karyaId}`);

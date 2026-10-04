@@ -138,3 +138,15 @@ export function formatWaktuLengkap(
 
   return `${hariNama}, ${tgl} ${bulan} ${tahun} pukul ${jam}:${menit} WIB`;
 }
+
+/**
+ * Format jam dan menit sederhana (HH:mm) untuk gelembung percakapan chat
+ */
+export function formatJamMenit(
+  dateInput: string | Date | number | undefined | null
+): string {
+  const date = toValidDate(dateInput);
+  if (!date) return '';
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}

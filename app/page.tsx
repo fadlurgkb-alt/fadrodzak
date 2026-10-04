@@ -1,10 +1,11 @@
-﻿import React from 'react';
+import React from 'react';
 import Link from 'next/link';
 import pool from '../lib/db';
 import HeroBanner from '../components/HeroBanner';
 import KaryaSearchFeed, { KaryaRow } from '../components/KaryaSearchFeed';
 import PWAInstallButton from '../components/PWAInstallButton';
 import HeaderSearchBar from '../components/HeaderSearchBar';
+import LastReadWidget from '../components/LastReadWidget';
 import { SearchProvider } from '../components/SearchContext';
 import { revalidatePath } from 'next/cache';
 import { BookOpen, PenLine, Compass, Coffee } from 'lucide-react';
@@ -91,6 +92,7 @@ export default async function HomePage({ searchParams }: PageProps) {
             
             {/* Kolom Kiri: Feed Utama Karya Sastra */}
             <div className="lg:col-span-8">
+              <LastReadWidget />
               <KaryaSearchFeed
                 initialKaryas={initialKaryas}
                 kategoriAktif={kategoriAktif}

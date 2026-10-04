@@ -357,6 +357,8 @@ export default function KaryaSearchFeed({
                       <img
                         src={karya.gambar_url}
                         alt={`Sampul ${karya.judul}`}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover"
                       />
                     </Link>

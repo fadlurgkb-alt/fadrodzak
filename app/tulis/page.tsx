@@ -21,6 +21,7 @@ export default async function TulisKaryaPage({
   const defaultJudul = typeof query.judul === 'string'
     ? query.judul
     : (querySeri && queryBab ? `${querySeri} — Bab ${queryBab}` : '');
+  const queryError = typeof query.error === 'string' ? query.error : null;
 
   let currentUser: any = null;
   try {
@@ -71,7 +72,11 @@ export default async function TulisKaryaPage({
 
     const gambar = formData.get('gambar');
     let gambarUrl: string | null = null;
+    const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
     if (gambar instanceof File && gambar.size > 0) {
+      if (gambar.size > MAX_IMAGE_SIZE) {
+        redirect('/tulis?error=Ukuran+gambar+sampul+maksimal+2MB');
+      }
       try {
         const buffer = Buffer.from(await gambar.arrayBuffer());
         gambarUrl = `data:${gambar.type || 'image/jpeg'};base64,${buffer.toString('base64')}`;
@@ -138,6 +143,12 @@ export default async function TulisKaryaPage({
             <span className="text-[11px] bg-[#C85A32] text-white px-2.5 py-0.5 rounded-full font-medium">
               Bab Baru
             </span>
+          </div>
+        )}
+
+        {queryError && (
+          <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-xs text-red-700 font-medium flex items-center justify-between">
+            <span>{queryError}</span>
           </div>
         )}
 

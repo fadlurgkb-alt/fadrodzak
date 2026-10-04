@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { MessageSquareText, Feather, Send, User } from 'lucide-react';
+import { showToast } from './Toast';
 
 export interface TafsirItem {
   id: number;
@@ -54,6 +55,7 @@ export default function TafsirBaitSection({
 
     setTafsirList([newObj, ...tafsirList]);
     setIsiTafsir('');
+    showToast('Tafsir bait berhasil dikirim!', 'success');
 
     if (onKirimTafsir) {
       const fd = new FormData();

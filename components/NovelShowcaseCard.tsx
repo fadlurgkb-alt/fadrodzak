@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { formatWaktuRelatif } from '../lib/date';
 import { isBookmarked, toggleBookmark } from '../lib/bookmark';
+import { showToast } from './Toast';
 
 export interface SiblingChapter {
   id: number;
@@ -107,6 +108,7 @@ export default function NovelShowcaseCard({
       url: `/karya/${currentKaryaId}`,
     });
     setBookmarked(nextState);
+    showToast(nextState ? 'Tersimpan di rak bacaan' : 'Dihapus dari rak bacaan', 'info');
   };
 
   const handleCopyShare = async () => {
@@ -114,6 +116,7 @@ export default function NovelShowcaseCard({
       if (typeof window !== 'undefined') {
         await navigator.clipboard.writeText(window.location.href);
         setCopiedLink(true);
+        showToast('Tautan karya berhasil disalin!', 'success');
         setTimeout(() => setCopiedLink(false), 2500);
       }
     } catch {}
@@ -142,6 +145,8 @@ export default function NovelShowcaseCard({
                 <img
                   src={gambarUrl}
                   alt={`Sampul Novel ${displayTitle}`}
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-102"
                 />
               ) : (
