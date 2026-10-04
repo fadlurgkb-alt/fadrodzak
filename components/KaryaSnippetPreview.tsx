@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Quote } from 'lucide-react';
@@ -21,15 +21,14 @@ export default function KaryaSnippetPreview({
   snippet = '',
   maxPoemLines = 3,
 }: KaryaSnippetPreviewProps) {
-  // Jika pencarian cocok di tengah teks, tampilkan potongan kalimat relevan
   if (searchQuery.trim() && isMatchedInContent && snippet) {
     return (
-      <div className="my-2.5 p-3 rounded-xl bg-[#FAF8F5] border border-[#E8DED6]">
-        <div className="flex items-center gap-1.5 text-[10px] font-semibold text-[#C85A32] mb-1 uppercase tracking-wider">
-          <Quote className="w-3 h-3 text-[#C85A32]" />
-          Ditemukan dalam bait teks:
+      <div className="my-3 p-3.5 rounded-xl bg-[#FAF8F5] border border-[#EAE2D9]">
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-[#C85A32] mb-1 uppercase tracking-wider">
+          <Quote className="w-3.5 h-3.5 text-[#C85A32]" />
+          <span>Ditemukan dalam bait teks:</span>
         </div>
-        <p className="text-[#2C2A29] leading-relaxed font-serif text-sm italic line-clamp-2 whitespace-pre-line">
+        <p className="text-[#242120] leading-relaxed font-serif text-base italic line-clamp-2 whitespace-pre-line">
           &ldquo;
           <HighlightText text={snippet} query={searchQuery} />
           &rdquo;
@@ -41,7 +40,6 @@ export default function KaryaSnippetPreview({
   const cleanText = stripHtmlPreserveBreaks(isiTulisan);
   const normalizedCategory = (kategori || '').toLowerCase().trim();
 
-  // Deteksi apakah karya berformat sajak/puisi/pantun
   const hasVerseLines = cleanText.includes('\n');
   const isPoeticCategory =
     normalizedCategory === 'puisi' ||
@@ -71,8 +69,8 @@ export default function KaryaSnippetPreview({
     const hasMore = allLines.length > maxPoemLines || stanzas.length > 1;
 
     return (
-      <div className="my-2 pl-3.5 border-l-2 border-[#C85A32]/60 py-0.5">
-        <div className="font-serif text-[#2C2A29] text-sm sm:text-[15px] leading-relaxed italic space-y-0.5">
+      <div className="my-3 pl-4 border-l-2 border-[#C85A32]/50 py-0.5">
+        <div className="font-serif text-[#242120] text-base sm:text-[17px] leading-relaxed italic space-y-1">
           {previewLines.map((line, idx) => (
             <p key={idx} className="tracking-normal truncate">
               {searchQuery.trim() ? (
@@ -83,8 +81,8 @@ export default function KaryaSnippetPreview({
             </p>
           ))}
           {hasMore && (
-            <p className="text-[11px] text-[#6B625D] not-italic pt-0.5">
-              &hellip; (baca selengkapnya)
+            <p className="text-xs text-[#5C544F] not-italic pt-1">
+              &hellip; (baca selengkapnya untuk bait utuh)
             </p>
           )}
         </div>
@@ -101,7 +99,7 @@ export default function KaryaSnippetPreview({
   const firstParagraph = paragraphs[0] || cleanText;
 
   return (
-    <div className="my-2 text-sm sm:text-[15px] leading-relaxed text-[#6B625D] font-serif italic line-clamp-2 sm:line-clamp-3">
+    <div className="my-3 text-base sm:text-[17px] leading-relaxed text-[#383330] font-serif italic line-clamp-3">
       {searchQuery.trim() ? (
         <HighlightText text={firstParagraph} query={searchQuery} />
       ) : (

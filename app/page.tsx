@@ -1,170 +1,159 @@
-import pool from '../lib/db';
+﻿import React from 'react';
 import Link from 'next/link';
-import { Suspense } from 'react';
-import NotificationModal from '../components/NotificationModal';
-import LoginButton from '../components/LoginButton';
-import DailyLiteraryGreeting from '../components/DailyLiteraryGreeting';
-import DailyPromptWidget from '../components/DailyPromptWidget';
+import pool from '../lib/db';
 import HeroBanner from '../components/HeroBanner';
-import FadrodzakLogo from '../components/FadrodzakLogo';
-import PWAInstallButton from '../components/PWAInstallButton';
-import { SearchProvider } from '../components/SearchContext';
-import HeaderSearchBar from '../components/HeaderSearchBar';
 import KaryaSearchFeed, { KaryaRow } from '../components/KaryaSearchFeed';
-import { getCurrentUser } from '../lib/auth-server';
+import PWAInstallButton from '../components/PWAInstallButton';
+import HeaderSearchBar from '../components/HeaderSearchBar';
 import { revalidatePath } from 'next/cache';
+import { BookOpen, PenLine, Compass, Sparkles, Coffee } from 'lucide-react';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 30;
 
-async function handleLike(formData: FormData) {
-  'use server';
-
-  const karyaId = Number(formData.get('karyaId'));
-  if (!Number.isInteger(karyaId) || karyaId <= 0) return;
-
-  let sessionUser = null;
-  try {
-    sessionUser = await getCurrentUser();
-  } catch {}
-
-  const nama = sessionUser?.name || 'Pembaca Sastra';
-  const email = sessionUser?.email || '';
-
-  // 1. Catat ke tabel likes
-  await pool.query(
-    'INSERT INTO likes (karya_id, nama_pengguna, user_email) VALUES ($1, $2, $3)',
-    [karyaId, nama, email]
-  );
-
-  // 2. Sinkronkan jumlah_suka pada tabel karya
-  await pool.query(
-    'UPDATE karya SET jumlah_suka = COALESCE(jumlah_suka, 0) + 1 WHERE id = $1',
-    [karyaId]
-  );
-
-  revalidatePath('/');
-  revalidatePath(`/karya/${karyaId}`);
-  revalidatePath('/profil');
+interface PageProps {
+  searchParams?: Promise<{
+    kategori?: string;
+    q?: string;
+    page?: string;
+  }>;
 }
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams?: Promise<{ kategori?: string; q?: string; page?: string }>;
-}) {
-  const resolvedSearchParams = await searchParams;
-  const kategoriAktif = resolvedSearchParams?.kategori || 'Semua';
-  const initialQuery = resolvedSearchParams?.q || '';
+export default async function HomePage({ searchParams }: PageProps) {
+  const resolvedParams = searchParams ? await searchParams : {};
+  const kategoriAktif = resolvedParams?.kategori || 'Semua';
 
-  const baseQuery = `
-    SELECT
-      k.*,
-      GREATEST(
-        COALESCE(k.jumlah_suka, 0),
-        COALESCE((SELECT COUNT(*)::int FROM likes l WHERE l.karya_id = k.id), 0)
-      ) AS total_likes,
-      GREATEST(
-        COALESCE(k.jumlah_komentar, 0),
-        COALESCE((SELECT COUNT(*)::int FROM komentar c WHERE c.karya_id = k.id), 0)
-      ) AS total_komentar
-    FROM karya k
-  `;
-
-  let karyas = [];
+  // Ambil daftar karya sastra dari database
+  let initialKaryas: KaryaRow[] = [];
   try {
-    if (kategoriAktif === 'Semua') {
-      const { rows } = await pool.query(`${baseQuery} ORDER BY k.created_at DESC`);
-      karyas = rows;
-    } else if (
-      kategoriAktif.toLowerCase().includes('novel') ||
-      kategoriAktif.toLowerCase().includes('cerbung')
-    ) {
-      const { rows } = await pool.query(
-        `${baseQuery} WHERE (k.kategori ILIKE '%novel%' OR k.kategori ILIKE '%cerbung%' OR k.kategori ILIKE '%cerita bersambung%') ORDER BY k.created_at DESC`
-      );
-      karyas = rows;
-    } else {
-      const { rows } = await pool.query(
-        `${baseQuery} WHERE k.kategori = $1 ORDER BY k.created_at DESC`,
-        [kategoriAktif]
-      );
-      karyas = rows;
-    }
+    const { rows } = await pool.query(
+      `SELECT id, judul, kategori, isi_tulisan, nama_pengguna, status_penulis, 
+              link_trakteer, gambar_url, user_id, 
+              COALESCE(jumlah_suka, 0) as total_likes, 
+              COALESCE(jumlah_komentar, 0) as total_komentar,
+              created_at, nomor_bab, judul_bab, nama_cerita, sinopsis, status_cerita
+       FROM karya 
+       ORDER BY created_at DESC 
+       LIMIT 100`
+    );
+    initialKaryas = rows || [];
   } catch (err) {
-    console.warn('[Home] Query karyas fallback:', err);
-    karyas = [];
+    console.warn('[HomePage] Notice:', err);
+  }
+
+  // Server Action untuk tombol Like / Apresiasi
+  async function handleLikeAction(formData: FormData) {
+    'use server';
+    const karyaId = Number(formData.get('karyaId'));
+    if (!karyaId) return;
+
+    try {
+      await pool.query('UPDATE karya SET jumlah_suka = COALESCE(jumlah_suka, 0) + 1 WHERE id = $1', [karyaId]);
+      revalidatePath('/');
+    } catch (e) {
+      console.warn('[Like] Notice:', e);
+    }
   }
 
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen p-8 max-w-4xl mx-auto flex items-center justify-center font-serif text-[#7A6B63]">
-          Memuat beranda sastra Fadrodzak...
+    <main className="min-h-screen pb-24 sm:pb-16 text-[#2C2A29]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        
+        {/* Header Baris Atas: Logo, Search Bar, & Tombol Navigasi Desktop */}
+        <div className="flex items-center justify-between gap-4 mb-6 pb-4 border-b border-[#EAE2D9]">
+          <Link href="/" className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1A19] tracking-tight">
+            Fadrodzak
+          </Link>
+
+          <div className="flex items-center gap-3">
+            <HeaderSearchBar />
+            <Link
+              href="/tulis"
+              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 bg-[#C85A32] hover:bg-[#A94728] text-white rounded-xl text-xs font-medium shadow-xs transition"
+            >
+              <PenLine className="w-3.5 h-3.5" />
+              <span>Tulis</span>
+            </Link>
+          </div>
         </div>
-      }
-    >
-      <SearchProvider initialQuery={initialQuery}>
-        <main className="min-h-screen p-4 sm:p-8 max-w-4xl mx-auto pb-24">
-          {/* Header Utama Fadrodzak dengan Pencarian Cerdas Terintegrasi */}
-          <header className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 mb-6 border-b border-[#E8DED6] pb-4">
-            <FadrodzakLogo size="md" variant="compact" showLink={true} />
 
-            {/* Kolom Pencarian Header: Filter Judul, Penulis, & Cuplikan Bait */}
-            <div className="order-3 sm:order-none w-full sm:w-auto flex-1 max-w-sm sm:mx-3">
-              <HeaderSearchBar />
-            </div>
+        {/* 1. Hero Banner Berkarakter Editorial */}
+        <HeroBanner />
 
-            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-              <NotificationModal />
-              <LoginButton />
-            </div>
-          </header>
+        {/* 2. Banner Pasang Aplikasi Tipis */}
+        <div className="mb-8">
+          <PWAInstallButton variant="banner" />
+        </div>
 
-          {/* Banner Pasang Aplikasi PWA */}
-          <div className="mb-6">
-            <PWAInstallButton variant="banner" />
+        {/* 3. Layout Konten: Main Feed (Kiri) + Sidebar Kuratorial (Kanan Desktop) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+          
+          {/* Kolom Kiri: Feed Utama Karya Sastra */}
+          <div className="lg:col-span-8">
+            <KaryaSearchFeed
+              initialKaryas={initialKaryas}
+              kategoriAktif={kategoriAktif}
+              onLikeAction={handleLikeAction}
+            />
           </div>
 
-          {/* Banner Judul & Identitas Brand Fadrodzak */}
-          <HeroBanner />
-
-          {/* 1. Sapaan Aksara Harian */}
-          <DailyLiteraryGreeting />
-
-          {/* 2. Kalender Tantangan Harian */}
-          <DailyPromptWidget />
-
-          {/* Bagian Kurasi & Eksplorasi Karya */}
-          <section className="mb-6">
-            <div className="flex items-center justify-between mb-2">
-              <div>
-                <p className="text-[11px] font-semibold text-[#C85A32] uppercase tracking-wider">
-                  Ruang Baca &amp; Apresiasi
-                </p>
-                <h2 className="text-xl sm:text-2xl font-serif text-[#2C2A29] font-bold">
-                  Karya Terbaru Anggota Komunitas
-                </h2>
+          {/* Kolom Kanan (Desktop): Sidebar Kurasi Editorial Sastra */}
+          <aside className="hidden lg:block lg:col-span-4 space-y-6">
+            
+            {/* Widget 1: Klinik Bedah Karya Spotlight */}
+            <div className="bg-[#FFFDF9] border border-[#E2D7CC] rounded-2xl p-5 shadow-xs space-y-3">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#C85A32]">
+                <Compass className="w-4 h-4" />
+                <span>Klinik Bedah Karya</span>
               </div>
+              <h3 className="font-serif font-bold text-lg text-[#1C1A19] leading-snug">
+                Telaah Diksi & Rima Sastra
+              </h3>
+              <p className="text-xs text-[#5C544F] leading-relaxed">
+                Ingin bait puisi atau alur cerpen Anda ditelaah secara mendalam? Kirimkan naskah untuk mendapatkan masukan kurator.
+              </p>
               <Link
                 href="/belajar"
-                className="text-xs text-[#C85A32] hover:text-[#A94728] font-semibold hidden sm:inline"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#C85A32] hover:text-[#A94728] transition"
               >
-                Lihat Bedah Karya Mingguan &rarr;
+                <span>Pelajari Klinik Sastra &rarr;</span>
               </Link>
             </div>
-            <p className="text-xs sm:text-sm text-[#6B625D]">
-              Telusuri karya berdasarkan judul, nama penulis, maupun cuplikan bait sastra Nusantara.
-            </p>
-          </section>
 
-          {/* Feed Eksplorasi Karya dengan Filter Real-time & Cuplikan Bait */}
-          <KaryaSearchFeed
-            initialKaryas={karyas as KaryaRow[]}
-            kategoriAktif={kategoriAktif}
-            onLikeAction={handleLike}
-          />
-        </main>
-      </SearchProvider>
-    </Suspense>
+            {/* Widget 2: Kategori & Ragam Sastra */}
+            <div className="bg-[#FFFDF9] border border-[#E2D7CC] rounded-2xl p-5 shadow-xs space-y-3">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#C85A32]">
+                <BookOpen className="w-4 h-4" />
+                <span>Ragam Aksara</span>
+              </div>
+              <div className="flex flex-wrap gap-2 text-xs">
+                {['Puisi', 'Cerpen', 'Pantun', 'Novel', 'Cerbung'].map((kat) => (
+                  <Link
+                    key={kat}
+                    href={`/?kategori=${encodeURIComponent(kat)}`}
+                    className="px-3 py-1.5 rounded-xl bg-[#FAF8F5] border border-[#EAE2D9] text-[#4A4440] hover:text-[#C85A32] hover:border-[#C85A32]/40 transition font-medium"
+                  >
+                    {kat}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Widget 3: Apresiasi & Ruang Donasi */}
+            <div className="bg-[#FAF8F5] border border-[#E2D7CC] rounded-2xl p-5 space-y-2.5">
+              <div className="flex items-center gap-2 text-xs font-semibold text-[#1C1A19]">
+                <Coffee className="w-4 h-4 text-[#C85A32]" />
+                <span>Dukung Penulis Nusantara</span>
+              </div>
+              <p className="text-xs text-[#5C544F] leading-relaxed">
+                Setiap bait tulisan memiliki jiwa. Anda dapat memberikan apresiasi kopi langsung ke halaman Trakteer penulis di setiap karya.
+              </p>
+            </div>
+
+          </aside>
+
+        </div>
+
+      </div>
+    </main>
   );
 }
