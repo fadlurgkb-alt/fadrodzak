@@ -9,7 +9,7 @@ import { PenLine, BookOpen, Feather, ArrowLeft, Image } from 'lucide-react';
 export const dynamic = 'force-dynamic';
 
 export default async function TulisKaryaPage() {
-  let currentUser = null;
+  let currentUser: any = null;
   try {
     currentUser = await getCurrentUser();
   } catch (err) {
