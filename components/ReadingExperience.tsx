@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
@@ -85,8 +85,8 @@ export default function ReadingExperience({
   nextChapter = null,
 }: Props) {
   const [showChapterList, setShowChapterList] = useState(false);
-  // 1. Pengaturan Mode Baca (Sepia Kertas, Dark Malam, OLED Hitam, Terang)
-  const [themeMode, setThemeMode] = useState<'sepia' | 'dark' | 'oled' | 'light'>('sepia');
+  // 1. Pengaturan Mode Baca (Kertas Antik, Kopi Tumpah, Note Garis, Malam Teduh)
+  const [themeMode, setThemeMode] = useState<'sepia' | 'coffee' | 'note' | 'dark'>('sepia');
   const [fontSize, setFontSize] = useState<number>(19); // Default 19px (nyaman untuk mata)
   const [fontFamily, setFontFamily] = useState<'serif' | 'sans'>('serif');
   const [isZenMode, setIsZenMode] = useState(false);
@@ -239,35 +239,93 @@ export default function ReadingExperience({
     }
   };
 
-  // Konfigurasi Tema Desain Premium & Kontras Nyaman
-  const isDark = themeMode === 'dark' || themeMode === 'oled';
+  // Konfigurasi Tema Desain Premium (Kertas Antik, Kopi Tumpah, Note Garis, Malam Teduh)
+  type ThemeMode = 'sepia' | 'coffee' | 'note' | 'dark';
+  const isDark = themeMode === 'dark';
+  const isCoffee = themeMode === 'coffee';
+  const isNote = themeMode === 'note';
 
-  const pageThemeClasses = {
+  // Warna aksen teks per tema
+  const accentTextClass = isDark
+    ? 'text-[#E27E5A]'
+    : isCoffee
+    ? 'text-[#A2481A]'
+    : isNote
+    ? 'text-[#2B5885]'
+    : 'text-[#C85A32]';
+
+  const accentBadgeBgClass = isDark
+    ? 'bg-[#E27E5A]/20 text-[#E27E5A]'
+    : isCoffee
+    ? 'bg-[#A2481A]/15 text-[#A2481A]'
+    : isNote
+    ? 'bg-[#2B5885]/15 text-[#2B5885]'
+    : 'bg-[#C85A32]/10 text-[#C85A32]';
+
+  const titleTextClass = isDark
+    ? 'text-[#F9F6F0]'
+    : isCoffee
+    ? 'text-[#261308]'
+    : isNote
+    ? 'text-[#0E1B2D]'
+    : 'text-[#1A1817]';
+
+  const bodyTextClass = isDark
+    ? 'text-[#E6DFD5]'
+    : isCoffee
+    ? 'text-[#2C190D]'
+    : isNote
+    ? 'text-[#142338]'
+    : 'text-[#282523]';
+
+  const metaTextClass = isDark
+    ? 'text-[#A39B92]'
+    : isCoffee
+    ? 'text-[#694D38]'
+    : isNote
+    ? 'text-[#4D647E]'
+    : 'text-[#6B625D]';
+
+  const pageThemeClasses: Record<ThemeMode, string> = {
     sepia: 'bg-[#F5EFEB] text-[#282523]',
+    coffee: 'bg-[#EFE3D3] text-[#2C190D]',
+    note: 'bg-[#EFECE6] text-[#142338]',
     dark: 'bg-[#121110] text-[#E6DFD5]',
-    oled: 'bg-[#000000] text-[#EDEDED]',
-    light: 'bg-[#FBF9F6] text-[#222222]',
   };
 
-  const articleCardClasses = {
+  const articleCardClasses: Record<ThemeMode, string> = {
     sepia: 'bg-[#FFFDF8] border-[#DFCFC1] shadow-[0_2px_14px_rgba(40,37,35,0.04)]',
+    coffee: 'bg-[#FAF2E4] border-[#D6BA96] shadow-[0_4px_22px_rgba(65,38,18,0.08)]',
+    note: 'bg-[#FDFCFA] border-[#D3DDE8] border-l-4 border-l-rose-400/80 shadow-[0_3px_16px_rgba(30,45,65,0.07)] [background-image:repeating-linear-gradient(transparent,transparent_31px,rgba(165,190,220,0.32)_31px,rgba(165,190,220,0.32)_32px)]',
     dark: 'bg-[#1A1918] border-[#2E2B28] shadow-[0_4px_24px_rgba(0,0,0,0.45)]',
-    oled: 'bg-[#0A0A0A] border-[#1F1F1F] shadow-none',
-    light: 'bg-[#FFFFFF] border-[#E8E4DF] shadow-[0_2px_14px_rgba(0,0,0,0.03)]',
   };
 
-  const toolbarClasses = {
+  const toolbarClasses: Record<ThemeMode, string> = {
     sepia: 'bg-[#F5EFEB]/90 border-[#DFCFC1] text-[#635B54]',
+    coffee: 'bg-[#EFE3D3]/90 border-[#D6BA96] text-[#614532]',
+    note: 'bg-[#EFECE6]/90 border-[#D3DDE8] text-[#475E77]',
     dark: 'bg-[#121110]/95 border-[#2E2B28] text-[#A39B92]',
-    oled: 'bg-black/95 border-[#1F1F1F] text-[#888888]',
-    light: 'bg-[#FBF9F6]/90 border-[#E8E4DF] text-[#666666]',
   };
 
-  const controlButtonClasses = {
+  const controlButtonClasses: Record<ThemeMode, string> = {
     sepia: 'bg-[#FAF6F0] border-[#DECBC0] text-[#4A433E] hover:border-[#C85A32]',
+    coffee: 'bg-[#F5E8D7] border-[#DEC09E] text-[#422919] hover:border-[#A2481A]',
+    note: 'bg-[#F8F6F2] border-[#D0DAE5] text-[#263D57] hover:border-[#2B5885]',
     dark: 'bg-[#1E1C1A] border-[#332F2B] text-[#D1C9BE] hover:border-[#E27E5A]',
-    oled: 'bg-[#141414] border-[#262626] text-[#CCCCCC] hover:border-[#E27E5A]',
-    light: 'bg-[#F3EFEA] border-[#E0D8CE] text-[#333333] hover:border-[#C85A32]',
+  };
+
+  const synopsisCardClasses: Record<ThemeMode, string> = {
+    sepia: 'bg-[#F7F2EB] border-[#DFCFC1] text-[#282523]',
+    coffee: 'bg-[#F4E6D2] border-[#D4B38C] text-[#2C190D]',
+    note: 'bg-[#FFFCE8] border-[#E8DEAF] text-[#142338] shadow-2xs',
+    dark: 'bg-[#22201E] border-[#38332E] text-[#DDD5CA]',
+  };
+
+  const audioCardClasses: Record<ThemeMode, string> = {
+    sepia: 'bg-[#FAF0E6] border-[#E8DACB]',
+    coffee: 'bg-[#F3E5D1] border-[#D6B690]',
+    note: 'bg-[#F0F5FA] border-[#CFDEED]',
+    dark: 'bg-[#22201E] border-[#38332E]',
   };
 
   return (
@@ -449,9 +507,33 @@ export default function ReadingExperience({
                     ? 'bg-[#C85A32] text-white font-bold shadow-2xs'
                     : 'opacity-70 hover:opacity-100'
                 }`}
-                title="Nuansa Kertas Buku Hangat"
+                title="Nuansa Kertas Buku Antik"
               >
                 Kertas
+              </button>
+              <button
+                type="button"
+                onClick={() => setThemeMode('coffee')}
+                className={`px-2 py-1 rounded-lg text-xs font-serif transition cursor-pointer ${
+                  themeMode === 'coffee'
+                    ? 'bg-[#A2481A] text-white font-bold shadow-2xs'
+                    : 'opacity-70 hover:opacity-100'
+                }`}
+                title="Nuansa Kopi Tumpah di Kertas (Parchment Hangat)"
+              >
+                ☕ Kopi
+              </button>
+              <button
+                type="button"
+                onClick={() => setThemeMode('note')}
+                className={`px-2 py-1 rounded-lg text-xs font-serif transition cursor-pointer ${
+                  themeMode === 'note'
+                    ? 'bg-[#2B5885] text-white font-bold shadow-2xs'
+                    : 'opacity-70 hover:opacity-100'
+                }`}
+                title="Buku Catatan Garis-Garis (Kertas Bergaris & Tinta Pena)"
+              >
+                📝 Catatan
               </button>
               <button
                 type="button"
@@ -461,33 +543,9 @@ export default function ReadingExperience({
                     ? 'bg-[#E27E5A] text-white font-bold shadow-2xs'
                     : 'opacity-70 hover:opacity-100'
                 }`}
-                title="Mode Malam Elegan (Abu Arang)"
+                title="Mode Malam Teduh (Abu Arang)"
               >
-                Malam
-              </button>
-              <button
-                type="button"
-                onClick={() => setThemeMode('oled')}
-                className={`px-2 py-1 rounded-lg text-xs font-serif transition cursor-pointer ${
-                  themeMode === 'oled'
-                    ? 'bg-black text-[#E27E5A] font-bold border border-[#333]'
-                    : 'opacity-70 hover:opacity-100'
-                }`}
-                title="Mode OLED Hitam Pekat (Hemat Daya)"
-              >
-                OLED
-              </button>
-              <button
-                type="button"
-                onClick={() => setThemeMode('light')}
-                className={`px-2 py-1 rounded-lg text-xs font-serif transition cursor-pointer ${
-                  themeMode === 'light'
-                    ? 'bg-white text-[#1A1817] font-bold shadow-2xs'
-                    : 'opacity-70 hover:opacity-100'
-                }`}
-                title="Mode Terang Bersih"
-              >
-                Terang
+                🌙 Malam
               </button>
             </div>
 
@@ -551,9 +609,7 @@ export default function ReadingExperience({
           <div className="mb-8 pb-7 border-b transition-colors border-current/10">
             {/* Kategori & Status Badge */}
             <div className="flex items-center gap-2 flex-wrap mb-3">
-              <span className={`text-xs font-bold tracking-wider uppercase font-sans ${
-                isDark ? 'text-[#E27E5A]' : 'text-[#C85A32]'
-              }`}>
+              <span className={`text-xs font-bold tracking-wider uppercase font-sans ${accentTextClass}`}>
                 {kategori === 'Novel' || kategori === 'Cerita Bersambung'
                   ? 'Novel & Cerita Bersambung'
                   : kategori}
@@ -562,6 +618,10 @@ export default function ReadingExperience({
                 <span className={`text-xs font-serif font-bold px-2.5 py-0.5 rounded-md border ${
                   isDark
                     ? 'bg-[#22201E] text-[#E27E5A] border-[#3D3833]'
+                    : isCoffee
+                    ? 'bg-[#F2E3CF] text-[#A2481A] border-[#D6BA96]'
+                    : isNote
+                    ? 'bg-[#EBF2FA] text-[#2B5885] border-[#D0DFEE]'
                     : 'bg-[#FAF0E6] text-[#C85A32] border-[#E8DEC0]'
                 }`}>
                   Bab {nomorBab}
@@ -581,23 +641,19 @@ export default function ReadingExperience({
             </div>
 
             {namaCerita && namaCerita !== judul && (
-              <p className={`text-xs font-serif font-bold uppercase tracking-wider mb-2 ${
-                isDark ? 'text-[#E27E5A]' : 'text-[#C85A32]'
-              }`}>
+              <p className={`text-xs font-serif font-bold uppercase tracking-wider mb-2 ${accentTextClass}`}>
                 Seri: {namaCerita}
               </p>
             )}
 
             {/* Judul Utama Artikel (Sangat Menonjol & Megah) */}
-            <h1 className={`text-3xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight leading-[1.15] mb-3 ${
-              isDark ? 'text-[#F9F6F0]' : 'text-[#1A1817]'
-            }`}>
+            <h1 className={`text-3xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight leading-[1.15] mb-3 ${titleTextClass}`}>
               {judul}
             </h1>
 
             {judulBab && (
               <p className={`text-lg sm:text-xl font-serif italic mb-4 font-medium ${
-                isDark ? 'text-[#D5CCC0]' : 'text-[#5C544F]'
+                isDark ? 'text-[#D5CCC0]' : isCoffee ? 'text-[#5C3B24]' : isNote ? 'text-[#3E5570]' : 'text-[#5C544F]'
               }`}>
                 {judulBab}
               </p>
@@ -605,17 +661,17 @@ export default function ReadingExperience({
 
             {/* Metadata Penulis & Waktu */}
             <div className={`flex flex-wrap items-center gap-2.5 text-xs sm:text-sm font-serif pt-3 border-t transition-colors ${
-              isDark ? 'border-[#2E2B28] text-[#A39B92]' : 'border-[#EAE0D5] text-[#6B625D]'
-            }`}>
+              isDark ? 'border-[#2E2B28]' : isCoffee ? 'border-[#D6BA96]/60' : isNote ? 'border-[#D3DDE8]' : 'border-[#EAE0D5]'
+            } ${metaTextClass}`}>
               <span>
-                Ditulis oleh <strong className={`font-semibold ${isDark ? 'text-[#E27E5A]' : 'text-[#C85A32]'}`}>{penulis}</strong>
+                Ditulis oleh <strong className={`font-semibold ${accentTextClass}`}>{penulis}</strong>
               </span>
               {createdAt && (
                 <>
                   <span className="opacity-40">•</span>
                   <time
                     dateTime={new Date(createdAt).toISOString()}
-                    className={isDark ? 'text-[#8E867E]' : 'text-[#8A8179]'}
+                    className="opacity-80"
                     title={formatWaktuLengkap(createdAt)}
                   >
                     {formatWaktuRelatif(createdAt)}
@@ -626,22 +682,14 @@ export default function ReadingExperience({
 
             {/* Sinopsis Cerita / Blurb (Didesain Ulang: Sangat Jelas & Nyaman Terbaca) */}
             {sinopsis && (
-              <div className={`mt-6 p-5 sm:p-6 rounded-2xl border transition-colors ${
-                isDark
-                  ? 'bg-[#22201E] border-[#38332E] text-[#DDD5CA]'
-                  : 'bg-[#F7F2EB] border-[#DFCFC1] text-[#282523]'
-              }`}>
+              <div className={`mt-6 p-5 sm:p-6 rounded-2xl border transition-colors ${synopsisCardClasses[themeMode]}`}>
                 <div className="flex items-center gap-2 mb-2">
-                  <Feather className={`w-3.5 h-3.5 ${isDark ? 'text-[#E27E5A]' : 'text-[#C85A32]'}`} />
-                  <span className={`text-[11px] font-bold uppercase tracking-wider font-sans ${
-                    isDark ? 'text-[#E27E5A]' : 'text-[#C85A32]'
-                  }`}>
+                  <Feather className={`w-3.5 h-3.5 ${accentTextClass}`} />
+                  <span className={`text-[11px] font-bold uppercase tracking-wider font-sans ${accentTextClass}`}>
                     Sinopsis &amp; Intisari Karya
                   </span>
                 </div>
-                <p className={`font-serif text-sm sm:text-base leading-relaxed italic ${
-                  isDark ? 'text-[#E6DFD5]' : 'text-[#2D2A28]'
-                }`}>
+                <p className={`font-serif text-sm sm:text-base leading-relaxed italic ${bodyTextClass}`}>
                   &ldquo;{sinopsis}&rdquo;
                 </p>
               </div>
@@ -650,26 +698,28 @@ export default function ReadingExperience({
 
           {/* Pemutar Audio Puisi oleh Penulis */}
           {audioUrl && (
-            <div className={`mb-8 p-4 rounded-2xl border flex items-center justify-between gap-3 transition-colors ${
-              isDark
-                ? 'bg-[#22201E] border-[#38332E]'
-                : 'bg-[#FAF0E6] border-[#E8DACB]'
-            }`}>
+            <div className={`mb-8 p-4 rounded-2xl border flex items-center justify-between gap-3 transition-colors ${audioCardClasses[themeMode]}`}>
               <div className="flex items-center gap-3">
                 <button
                   type="button"
                   onClick={toggleVoiceNote}
                   className={`w-10 h-10 rounded-full text-white flex items-center justify-center hover:scale-105 transition shadow-sm cursor-pointer ${
-                    isDark ? 'bg-[#E27E5A] hover:bg-[#C85A32]' : 'bg-[#C45A2C] hover:bg-[#A8451D]'
+                    isDark
+                      ? 'bg-[#E27E5A] hover:bg-[#C85A32]'
+                      : isCoffee
+                      ? 'bg-[#A2481A] hover:bg-[#863711]'
+                      : isNote
+                      ? 'bg-[#2B5885] hover:bg-[#1E4166]'
+                      : 'bg-[#C45A2C] hover:bg-[#A8451D]'
                   }`}
                 >
                   {isVoicePlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
                 </button>
                 <div>
-                  <p className={`font-serif font-bold text-xs ${isDark ? 'text-[#F9F6F0]' : 'text-[#2C2C2C]'}`}>
+                  <p className={`font-serif font-bold text-xs ${titleTextClass}`}>
                     Dengarkan Pembacaan Puisi
                   </p>
-                  <p className={`text-[11px] font-serif ${isDark ? 'text-[#A39B92]' : 'text-[#7A6B63]'}`}>
+                  <p className={`text-[11px] font-serif ${metaTextClass}`}>
                     Dibacakan langsung oleh {penulis}
                   </p>
                 </div>
@@ -693,9 +743,7 @@ export default function ReadingExperience({
               return (
                 <div key={idx} className="relative mb-7 sm:mb-9">
                   <p
-                    className={`whitespace-pre-wrap select-text leading-[1.85] sm:leading-[1.95] tracking-[0.01em] ${
-                      isDark ? 'text-[#E6DFD5]' : 'text-[#282523]'
-                    }`}
+                    className={`whitespace-pre-wrap select-text leading-[1.85] sm:leading-[1.95] tracking-[0.01em] ${bodyTextClass}`}
                   >
                     {bait}
                   </p>
@@ -722,7 +770,7 @@ export default function ReadingExperience({
 
           {/* Tombol Buat Kartu Kutipan Manual */}
           <div className={`pt-4 flex items-center justify-between gap-3 text-xs font-serif border-t ${
-            isDark ? 'border-[#2E2B28] text-[#8E867E]' : 'border-[#EAE0D5] text-[#8E8E8E]'
+            isDark ? 'border-[#2E2B28] text-[#8E867E]' : isCoffee ? 'border-[#D6BA96]/60 text-[#7A614E]' : isNote ? 'border-[#D3DDE8] text-[#556F8C]' : 'border-[#EAE0D5] text-[#8E8E8E]'
           }`}>
             <span className="italic">
               Sorot kalimat mana saja untuk menjadikannya kartu kutipan.
@@ -733,9 +781,7 @@ export default function ReadingExperience({
                 setSelectedText(isiTulisan.slice(0, 180));
                 setShowQuoteModal(true);
               }}
-              className={`inline-flex items-center gap-1.5 font-bold cursor-pointer transition ${
-                isDark ? 'text-[#E27E5A] hover:text-[#F09472]' : 'text-[#C85A32] hover:text-[#A94728]'
-              }`}
+              className={`inline-flex items-center gap-1.5 font-bold cursor-pointer transition ${accentTextClass} hover:opacity-80`}
             >
               <Sparkles className="w-3.5 h-3.5" />
               Bagikan Kartu Kutipan
@@ -745,7 +791,7 @@ export default function ReadingExperience({
           {/* Navigasi Bab Wattpad */}
           {(prevChapter || nextChapter || (siblingChapters && siblingChapters.length > 1)) && (
             <div className={`mt-8 pt-6 border-t space-y-4 ${
-              isDark ? 'border-[#2E2B28]' : 'border-[#E8DEC0]/80'
+              isDark ? 'border-[#2E2B28]' : isCoffee ? 'border-[#D6BA96]/60' : isNote ? 'border-[#D3DDE8]' : 'border-[#E8DEC0]/80'
             }`}>
               <div className="flex items-center justify-between gap-3 flex-wrap">
                 {prevChapter ? (
@@ -754,6 +800,10 @@ export default function ReadingExperience({
                     className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border text-xs font-serif font-bold transition shadow-2xs ${
                       isDark
                         ? 'border-[#332F2B] bg-[#1E1C1A] text-[#E27E5A] hover:border-[#E27E5A]'
+                        : isCoffee
+                        ? 'border-[#D6BA96] bg-[#F5E8D7] text-[#A2481A] hover:border-[#A2481A]'
+                        : isNote
+                        ? 'border-[#D0DAE5] bg-[#F8F6F2] text-[#2B5885] hover:border-[#2B5885]'
                         : 'border-[#DECBC0] bg-white text-[#C85A32] hover:border-[#C85A32] hover:bg-[#FAF0E6]'
                     }`}
                   >
@@ -773,6 +823,10 @@ export default function ReadingExperience({
                     className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-xs font-serif font-bold transition cursor-pointer ${
                       isDark
                         ? 'border-[#332F2B] bg-[#1E1C1A] text-[#B0A79C] hover:text-[#E27E5A]'
+                        : isCoffee
+                        ? 'border-[#D6BA96] bg-[#F5E8D7] text-[#694D38] hover:text-[#A2481A]'
+                        : isNote
+                        ? 'border-[#D0DAE5] bg-[#F8F6F2] text-[#3D5673] hover:text-[#2B5885]'
                         : 'border-[#DECBC0] bg-white text-[#7A6B63] hover:text-[#C85A32] hover:bg-[#FAF0E6]'
                     }`}
                   >
@@ -784,7 +838,15 @@ export default function ReadingExperience({
                 {nextChapter ? (
                   <Link
                     href={`/karya/${nextChapter.id}`}
-                    className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#C85A32] text-white hover:bg-[#A94728] text-xs font-serif font-bold transition shadow-xs"
+                    className={`inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-white text-xs font-serif font-bold transition shadow-xs ${
+                      isDark
+                        ? 'bg-[#E27E5A] hover:bg-[#C85A32]'
+                        : isCoffee
+                        ? 'bg-[#A2481A] hover:bg-[#863711]'
+                        : isNote
+                        ? 'bg-[#2B5885] hover:bg-[#1E4166]'
+                        : 'bg-[#C85A32] hover:bg-[#A94728]'
+                    }`}
                   >
                     Bab {nextChapter.nomor_bab || 'Selanjutnya'}
                     <ChevronRight className="w-4 h-4" />
@@ -799,16 +861,20 @@ export default function ReadingExperience({
               {/* Accordion Daftar Isi Seluruh Bab */}
               {showChapterList && siblingChapters.length > 0 && (
                 <div className={`p-4 rounded-2xl border animate-in fade-in duration-200 ${
-                  isDark ? 'bg-[#1E1C1A] border-[#38332E]' : 'bg-[#FAF7F2] border-[#E8DEC0]'
+                  isDark
+                    ? 'bg-[#1E1C1A] border-[#38332E]'
+                    : isCoffee
+                    ? 'bg-[#F5E8D7] border-[#D6BA96]'
+                    : isNote
+                    ? 'bg-[#F8F6F2] border-[#D0DAE5]'
+                    : 'bg-[#FAF7F2] border-[#E8DEC0]'
                 }`}>
-                  <h4 className={`font-serif font-bold text-xs uppercase tracking-wider mb-3 flex items-center gap-1.5 ${
-                    isDark ? 'text-[#E27E5A]' : 'text-[#C85A32]'
-                  }`}>
+                  <h4 className={`font-serif font-bold text-xs uppercase tracking-wider mb-3 flex items-center gap-1.5 ${accentTextClass}`}>
                     <BookOpen className="w-4 h-4" />
                     Daftar Isi Bab ({namaCerita || judul})
                   </h4>
                   <div className={`divide-y max-h-60 overflow-y-auto ${
-                    isDark ? 'divide-[#2A2724]' : 'divide-[#E8DEC0]/60'
+                    isDark ? 'divide-[#2A2724]' : isCoffee ? 'divide-[#DEC09E]/60' : isNote ? 'divide-[#D5DFEA]' : 'divide-[#E8DEC0]/60'
                   }`}>
                     {siblingChapters.map((ch) => {
                       const isCurrent = ch.id === karyaId;
@@ -818,15 +884,29 @@ export default function ReadingExperience({
                           href={`/karya/${ch.id}`}
                           className={`flex items-center justify-between py-2.5 px-3 rounded-lg text-xs font-serif transition ${
                             isCurrent
-                              ? (isDark ? 'bg-[#E27E5A]/20 font-bold text-[#E27E5A]' : 'bg-[#FAF0E6] font-bold text-[#C85A32]')
-                              : (isDark ? 'hover:bg-[#2A2724] text-[#B0A79C]' : 'hover:bg-white text-[#4A423D] hover:text-[#C85A32]')
+                              ? (isDark
+                                  ? 'bg-[#E27E5A]/20 font-bold text-[#E27E5A]'
+                                  : isCoffee
+                                  ? 'bg-[#A2481A]/15 font-bold text-[#A2481A]'
+                                  : isNote
+                                  ? 'bg-[#2B5885]/15 font-bold text-[#2B5885]'
+                                  : 'bg-[#FAF0E6] font-bold text-[#C85A32]')
+                              : (isDark
+                                  ? 'hover:bg-[#2A2724] text-[#B0A79C]'
+                                  : isCoffee
+                                  ? 'hover:bg-[#EFE2D1] text-[#422919]'
+                                  : isNote
+                                  ? 'hover:bg-[#EDF2F7] text-[#22364D]'
+                                  : 'hover:bg-white text-[#4A423D] hover:text-[#C85A32]')
                           }`}
                         >
                           <span className="truncate mr-2">
                             Bab {ch.nomor_bab || '—'}: {ch.judul_bab || ch.judul}
                           </span>
                           {isCurrent && (
-                            <span className="text-[10px] bg-[#C85A32] text-white px-2 py-0.5 rounded-full shrink-0">
+                            <span className={`text-[10px] text-white px-2 py-0.5 rounded-full shrink-0 ${
+                              isDark ? 'bg-[#E27E5A]' : isCoffee ? 'bg-[#A2481A]' : isNote ? 'bg-[#2B5885]' : 'bg-[#C85A32]'
+                            }`}>
                               Sedang Dibaca
                             </span>
                           )}
