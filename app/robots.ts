@@ -10,6 +10,6 @@ export default function robots(): MetadataRoute.Robots {
       disallow: ['/profil/edit', '/api/'],
     },
     sitemap: `${BASE_URL}/sitemap.xml`,
-    host: BASE_URL,
+    host: 'www.fadrodzak.my.id',
   };
 }

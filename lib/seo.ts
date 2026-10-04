@@ -1,4 +1,4 @@
-export const SITE_URL = 'https://fadrodzak.my.id';
+export const SITE_URL = 'https://www.fadrodzak.my.id';
 export const SITE_NAME = 'Fadrodzak';
 export const DEFAULT_TAGLINE = 'Ruang Sastra & Komunitas Aksara';
 
