@@ -4,8 +4,7 @@ import pool from '../../lib/db';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { getCurrentUser } from '../../lib/auth-server';
-import SubmitButton from '../../components/SubmitButton';
-import { PenLine, BookOpen, Feather, ArrowLeft, Image, Volume2, Sparkles, HelpCircle } from 'lucide-react';
+import { PenLine, BookOpen, Feather, ArrowLeft, Image } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +16,6 @@ export default async function TulisKaryaPage() {
     console.warn('[Tulis] Notice sesi:', err);
   }
 
-  // Ambil profil penulis jika sudah login
   let authorProfile = {
     nama: currentUser?.name || 'Penenun Kata',
     status_penulis: 'Pelajar Sastra',
@@ -42,7 +40,6 @@ export default async function TulisKaryaPage() {
     }
   }
 
-  // Server Action untuk Menerbitkan Karya
   async function simpanKaryaAction(formData: FormData) {
     'use server';
 
@@ -53,14 +50,12 @@ export default async function TulisKaryaPage() {
     const status_penulis = String(formData.get('status_penulis') || authorProfile.status_penulis).trim();
     const link_trakteer = String(formData.get('link_trakteer') || '').trim() || null;
 
-    // Bidang Novel / Cerbung
     const nama_cerita = String(formData.get('nama_cerita') || '').trim() || null;
     const nomorBabRaw = formData.get('nomor_bab');
     const nomor_bab = nomorBabRaw ? parseInt(String(nomorBabRaw), 10) || 1 : null;
     const judul_bab = String(formData.get('judul_bab') || '').trim() || null;
     const sinopsis = String(formData.get('sinopsis') || '').trim() || null;
 
-    // Upload Cover Gambar
     const gambar = formData.get('gambar');
     let gambarUrl: string | null = null;
     if (gambar instanceof File && gambar.size > 0) {
@@ -92,8 +87,6 @@ export default async function TulisKaryaPage() {
 
   return (
     <main className="min-h-screen pb-28 pt-6 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-[#2C2A29]">
-      
-      {/* Header Navigasi Atas */}
       <div className="flex items-center justify-between mb-8 pb-4 border-b border-[#EAE2D9]">
         <Link
           href="/"
@@ -108,8 +101,6 @@ export default async function TulisKaryaPage() {
       </div>
 
       <div className="bg-[#FFFDF9] border border-[#E2D7CC] rounded-3xl p-6 sm:p-10 shadow-xs space-y-8">
-        
-        {/* Judul Halaman Editorial */}
         <div className="space-y-2 border-b border-[#EAE2D9] pb-6">
           <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#C85A32]">
             <Feather className="w-4 h-4" />
@@ -124,8 +115,6 @@ export default async function TulisKaryaPage() {
         </div>
 
         <form action={simpanKaryaAction} className="space-y-8">
-          
-          {/* 1. Pemilihan Ragam Sastra (Kategori) */}
           <div className="space-y-3">
             <label className="block text-xs font-semibold uppercase tracking-wider text-[#5C544F]">
               Pilih Ragam Sastra
@@ -159,7 +148,6 @@ export default async function TulisKaryaPage() {
             </div>
           </div>
 
-          {/* 2. Judul Naskah (Kanvas Huruf Besar) */}
           <div className="space-y-2">
             <label className="block text-xs font-semibold uppercase tracking-wider text-[#5C544F]">
               Judul Karya
@@ -173,7 +161,6 @@ export default async function TulisKaryaPage() {
             />
           </div>
 
-          {/* 3. Bidang Khusus Seri / Cerita Bersambung (Opsional) */}
           <div className="p-5 rounded-2xl bg-[#FAF8F5] border border-[#EAE2D9] space-y-4">
             <div className="flex items-center gap-2 text-xs font-semibold text-[#C85A32] uppercase tracking-wider">
               <BookOpen className="w-3.5 h-3.5" />
@@ -209,7 +196,6 @@ export default async function TulisKaryaPage() {
             </div>
           </div>
 
-          {/* 4. Kanvas Penulisan Isi Karya Sastra */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="block text-xs font-semibold uppercase tracking-wider text-[#5C544F]">
@@ -229,7 +215,6 @@ export default async function TulisKaryaPage() {
             />
           </div>
 
-          {/* 5. Sampul Ilustrasi Naskah (Opsional) */}
           <div className="p-5 rounded-2xl bg-[#FAF8F5] border border-[#EAE2D9] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-[#C85A32]/10 text-[#C85A32] flex items-center justify-center shrink-0">
@@ -253,12 +238,10 @@ export default async function TulisKaryaPage() {
             />
           </div>
 
-          {/* Identitas Nama Pena */}
           <input type="hidden" name="nama_pengguna" value={authorProfile.nama} />
           <input type="hidden" name="status_penulis" value={authorProfile.status_penulis} />
           <input type="hidden" name="link_trakteer" value={authorProfile.link_trakteer} />
 
-          {/* Tombol Terbitkan Aksara */}
           <div className="pt-6 border-t border-[#EAE2D9] flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-xs text-[#5C544F]">
               Menerbitkan sebagai: <strong className="text-[#1C1A19]">{authorProfile.nama}</strong> ({authorProfile.status_penulis})
@@ -271,12 +254,13 @@ export default async function TulisKaryaPage() {
               >
                 Batal
               </Link>
-              <SubmitButton
-                label="Terbitkan Karya Sekarang"
-                loadingLabel="Menerbitkan Aksara..."
-                className="w-1/2 sm:w-auto"
-                icon={<PenLine className="w-4 h-4" />}
-              />
+              <button
+                type="submit"
+                className="w-1/2 sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-[#C85A32] hover:bg-[#A94728] text-white text-xs sm:text-sm font-medium rounded-xl shadow-xs transition-all duration-150 cursor-pointer active:scale-95"
+              >
+                <PenLine className="w-4 h-4" />
+                <span>Terbitkan Karya Sekarang</span>
+              </button>
             </div>
           </div>
 
