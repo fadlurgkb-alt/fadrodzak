@@ -16,11 +16,13 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    // PERBAIKAN: Menunggu Promise params selesai di-resolve
     const resolvedParams = await params;
-    const karyaId = resolvedParams.id;
+    const karyaId = Number.parseInt(resolvedParams.id, 10);
+    if (!Number.isInteger(karyaId) || karyaId <= 0) {
+      return NextResponse.json({ error: 'ID karya tidak valid' }, { status: 400, headers: corsHeaders });
+    }
     
-    const body = await request.json();
+    const body = await request.json().catch(() => ({}));
 
     await pool.query(
       'INSERT INTO likes (karya_id, user_email) VALUES ($1, $2)',

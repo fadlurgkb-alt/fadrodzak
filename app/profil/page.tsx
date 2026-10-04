@@ -74,10 +74,19 @@ async function hapusKarya(formData: FormData) {
   const karyaId = Number(formData.get('karyaId'));
   if (!Number.isInteger(karyaId) || karyaId <= 0) return;
 
-  await pool.query('DELETE FROM karya WHERE id = $1 AND user_id = $2', [
-    karyaId,
-    user.uid,
-  ]);
+  try {
+    // Bersihkan relasi anak untuk mencegah pelanggaran foreign key constraint
+    await pool.query('DELETE FROM reaksi_sastra WHERE karya_id = $1', [karyaId]);
+    await pool.query('DELETE FROM tafsir_bait WHERE karya_id = $1', [karyaId]);
+    await pool.query('DELETE FROM likes WHERE karya_id = $1', [karyaId]);
+    await pool.query('DELETE FROM komentar WHERE karya_id = $1', [karyaId]);
+    await pool.query('DELETE FROM karya WHERE id = $1 AND user_id = $2', [
+      karyaId,
+      user.uid,
+    ]);
+  } catch (err) {
+    console.error('[Profil] Gagal menghapus karya sastra:', err);
+  }
 
   revalidatePath('/profil');
   revalidatePath('/');

@@ -92,10 +92,11 @@ export default function ReadingExperience({
   const [isZenMode, setIsZenMode] = useState(false);
 
   // Penanda Buku (Bookmark) & Progress Baca
-  const [bookmarked, setBookmarked] = useState<boolean>(() => isBookmarked(karyaId));
+  const [bookmarked, setBookmarked] = useState<boolean>(false);
   const [readingProgress, setReadingProgress] = useState(0);
 
   useEffect(() => {
+    setBookmarked(isBookmarked(karyaId));
     const handleBookmarkChange = () => {
       setBookmarked(isBookmarked(karyaId));
     };

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   BookOpen,
@@ -69,11 +69,17 @@ export default function NovelShowcaseCard({
 }: NovelShowcaseCardProps) {
   const [showDonateModal, setShowDonateModal] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
-  const [bookmarked, setBookmarked] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false;
-    return isBookmarked(currentKaryaId);
-  });
+  const [bookmarked, setBookmarked] = useState<boolean>(false);
   const [showCoverModal, setShowCoverModal] = useState(false);
+
+  useEffect(() => {
+    setBookmarked(isBookmarked(currentKaryaId));
+    const handleBookmarkChange = () => {
+      setBookmarked(isBookmarked(currentKaryaId));
+    };
+    window.addEventListener('fadrodzak_bookmark_changed', handleBookmarkChange);
+    return () => window.removeEventListener('fadrodzak_bookmark_changed', handleBookmarkChange);
+  }, [currentKaryaId]);
 
   const displayTitle = namaCerita || judul.replace(/— Bab.*$/, '').trim() || judul;
   const currentChapterNumber = nomorBab || 1;

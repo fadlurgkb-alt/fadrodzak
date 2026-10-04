@@ -17,12 +17,20 @@ export async function POST(
 ) {
   try {
     const resolvedParams = await params;
-    const karyaId = resolvedParams.id;
-    const body = await request.json(); 
+    const karyaId = Number.parseInt(resolvedParams.id, 10);
+    if (!Number.isInteger(karyaId) || karyaId <= 0) {
+      return NextResponse.json({ error: 'ID karya tidak valid' }, { status: 400, headers: corsHeaders });
+    }
+
+    const body = await request.json().catch(() => ({})); 
 
     // KUNCI PERBAIKAN: Menangkap ejaan snake_case komentar
-    const namaPengguna = body.nama_pengguna || body.namaPengguna || "Anonim";
-    const isiKomentar = body.isi_komentar || body.isiKomentar || "";
+    const namaPengguna = String(body.nama_pengguna || body.namaPengguna || "Anonim").trim().slice(0, 100);
+    const isiKomentar = String(body.isi_komentar || body.isiKomentar || "").trim();
+
+    if (!isiKomentar) {
+      return NextResponse.json({ error: 'Isi komentar tidak boleh kosong' }, { status: 400, headers: corsHeaders });
+    }
 
     await pool.query(
       'INSERT INTO komentar (karya_id, nama_pengguna, isi_komentar) VALUES ($1, $2, $3)',
