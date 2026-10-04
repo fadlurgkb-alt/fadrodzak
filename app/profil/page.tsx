@@ -1,4 +1,4 @@
-import pool from '../../lib/db';
+﻿import pool from '../../lib/db';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { revalidatePath } from 'next/cache';
@@ -660,3 +660,4 @@ export default async function ProfilPage() {
     );
   }
 }
+
