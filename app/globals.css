@@ -1,0 +1,26 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-serif: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  --font-sans: var(--font-inter), Inter, system-ui, sans-serif;
+
+  --color-paper: #FAF8F5;
+  --color-surface: #FFFDF9;
+  --color-terracotta: #C85A32;
+  --color-terracotta-dark: #A94728;
+  --color-charcoal: #2C2A29;
+  --color-secondary: #6B625D;
+  --color-border: #E8DED6;
+  --color-accent-sage: #7A8B68;
+}
+
+body {
+  background-color: #FAF8F5;
+  color: #2C2A29;
+  font-family: var(--font-inter), Inter, system-ui, sans-serif;
+}
+
+h1, h2, h3, h4, .font-serif {
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+}
