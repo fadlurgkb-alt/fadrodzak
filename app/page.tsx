@@ -5,8 +5,9 @@ import HeroBanner from '../components/HeroBanner';
 import KaryaSearchFeed, { KaryaRow } from '../components/KaryaSearchFeed';
 import PWAInstallButton from '../components/PWAInstallButton';
 import HeaderSearchBar from '../components/HeaderSearchBar';
+import { SearchProvider } from '../components/SearchContext';
 import { revalidatePath } from 'next/cache';
-import { BookOpen, PenLine, Compass, Sparkles, Coffee } from 'lucide-react';
+import { BookOpen, PenLine, Compass, Coffee } from 'lucide-react';
 
 export const revalidate = 30;
 
@@ -55,105 +56,107 @@ export default async function HomePage({ searchParams }: PageProps) {
   }
 
   return (
-    <main className="min-h-screen pb-24 sm:pb-16 text-[#2C2A29]">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        
-        {/* Header Baris Atas: Logo, Search Bar, & Tombol Navigasi Desktop */}
-        <div className="flex items-center justify-between gap-4 mb-6 pb-4 border-b border-[#EAE2D9]">
-          <Link href="/" className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1A19] tracking-tight">
-            Fadrodzak
-          </Link>
-
-          <div className="flex items-center gap-3">
-            <HeaderSearchBar />
-            <Link
-              href="/tulis"
-              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 bg-[#C85A32] hover:bg-[#A94728] text-white rounded-xl text-xs font-medium shadow-xs transition"
-            >
-              <PenLine className="w-3.5 h-3.5" />
-              <span>Tulis</span>
-            </Link>
-          </div>
-        </div>
-
-        {/* 1. Hero Banner Berkarakter Editorial */}
-        <HeroBanner />
-
-        {/* 2. Banner Pasang Aplikasi Tipis */}
-        <div className="mb-8">
-          <PWAInstallButton variant="banner" />
-        </div>
-
-        {/* 3. Layout Konten: Main Feed (Kiri) + Sidebar Kuratorial (Kanan Desktop) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+    <SearchProvider>
+      <main className="min-h-screen pb-24 sm:pb-16 text-[#2C2A29]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           
-          {/* Kolom Kiri: Feed Utama Karya Sastra */}
-          <div className="lg:col-span-8">
-            <KaryaSearchFeed
-              initialKaryas={initialKaryas}
-              kategoriAktif={kategoriAktif}
-              onLikeAction={handleLikeAction}
-            />
-          </div>
+          {/* Header Baris Atas: Logo, Search Bar, & Tombol Navigasi Desktop */}
+          <div className="flex items-center justify-between gap-4 mb-6 pb-4 border-b border-[#EAE2D9]">
+            <Link href="/" className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1A19] tracking-tight">
+              Fadrodzak
+            </Link>
 
-          {/* Kolom Kanan (Desktop): Sidebar Kurasi Editorial Sastra */}
-          <aside className="hidden lg:block lg:col-span-4 space-y-6">
-            
-            {/* Widget 1: Klinik Bedah Karya Spotlight */}
-            <div className="bg-[#FFFDF9] border border-[#E2D7CC] rounded-2xl p-5 shadow-xs space-y-3">
-              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#C85A32]">
-                <Compass className="w-4 h-4" />
-                <span>Klinik Bedah Karya</span>
-              </div>
-              <h3 className="font-serif font-bold text-lg text-[#1C1A19] leading-snug">
-                Telaah Diksi & Rima Sastra
-              </h3>
-              <p className="text-xs text-[#5C544F] leading-relaxed">
-                Ingin bait puisi atau alur cerpen Anda ditelaah secara mendalam? Kirimkan naskah untuk mendapatkan masukan kurator.
-              </p>
+            <div className="flex items-center gap-3">
+              <HeaderSearchBar />
               <Link
-                href="/belajar"
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#C85A32] hover:text-[#A94728] transition"
+                href="/tulis"
+                className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 bg-[#C85A32] hover:bg-[#A94728] text-white rounded-xl text-xs font-medium shadow-xs transition"
               >
-                <span>Pelajari Klinik Sastra &rarr;</span>
+                <PenLine className="w-3.5 h-3.5" />
+                <span>Tulis</span>
               </Link>
             </div>
+          </div>
 
-            {/* Widget 2: Kategori & Ragam Sastra */}
-            <div className="bg-[#FFFDF9] border border-[#E2D7CC] rounded-2xl p-5 shadow-xs space-y-3">
-              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#C85A32]">
-                <BookOpen className="w-4 h-4" />
-                <span>Ragam Aksara</span>
-              </div>
-              <div className="flex flex-wrap gap-2 text-xs">
-                {['Puisi', 'Cerpen', 'Pantun', 'Novel', 'Cerbung'].map((kat) => (
-                  <Link
-                    key={kat}
-                    href={`/?kategori=${encodeURIComponent(kat)}`}
-                    className="px-3 py-1.5 rounded-xl bg-[#FAF8F5] border border-[#EAE2D9] text-[#4A4440] hover:text-[#C85A32] hover:border-[#C85A32]/40 transition font-medium"
-                  >
-                    {kat}
-                  </Link>
-                ))}
-              </div>
+          {/* 1. Hero Banner Berkarakter Editorial */}
+          <HeroBanner />
+
+          {/* 2. Banner Pasang Aplikasi Tipis */}
+          <div className="mb-8">
+            <PWAInstallButton variant="banner" />
+          </div>
+
+          {/* 3. Layout Konten: Main Feed (Kiri) + Sidebar Kuratorial (Kanan Desktop) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
+            
+            {/* Kolom Kiri: Feed Utama Karya Sastra */}
+            <div className="lg:col-span-8">
+              <KaryaSearchFeed
+                initialKaryas={initialKaryas}
+                kategoriAktif={kategoriAktif}
+                onLikeAction={handleLikeAction}
+              />
             </div>
 
-            {/* Widget 3: Apresiasi & Ruang Donasi */}
-            <div className="bg-[#FAF8F5] border border-[#E2D7CC] rounded-2xl p-5 space-y-2.5">
-              <div className="flex items-center gap-2 text-xs font-semibold text-[#1C1A19]">
-                <Coffee className="w-4 h-4 text-[#C85A32]" />
-                <span>Dukung Penulis Nusantara</span>
+            {/* Kolom Kanan (Desktop): Sidebar Kurasi Editorial Sastra */}
+            <aside className="hidden lg:block lg:col-span-4 space-y-6">
+              
+              {/* Widget 1: Klinik Bedah Karya Spotlight */}
+              <div className="bg-[#FFFDF9] border border-[#E2D7CC] rounded-2xl p-5 shadow-xs space-y-3">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#C85A32]">
+                  <Compass className="w-4 h-4" />
+                  <span>Klinik Bedah Karya</span>
+                </div>
+                <h3 className="font-serif font-bold text-lg text-[#1C1A19] leading-snug">
+                  Telaah Diksi & Rima Sastra
+                </h3>
+                <p className="text-xs text-[#5C544F] leading-relaxed">
+                  Ingin bait puisi atau alur cerpen Anda ditelaah secara mendalam? Kirimkan naskah untuk mendapatkan masukan kurator.
+                </p>
+                <Link
+                  href="/belajar"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#C85A32] hover:text-[#A94728] transition"
+                >
+                  <span>Pelajari Klinik Sastra &rarr;</span>
+                </Link>
               </div>
-              <p className="text-xs text-[#5C544F] leading-relaxed">
-                Setiap bait tulisan memiliki jiwa. Anda dapat memberikan apresiasi kopi langsung ke halaman Trakteer penulis di setiap karya.
-              </p>
-            </div>
 
-          </aside>
+              {/* Widget 2: Kategori & Ragam Sastra */}
+              <div className="bg-[#FFFDF9] border border-[#E2D7CC] rounded-2xl p-5 shadow-xs space-y-3">
+                <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#C85A32]">
+                  <BookOpen className="w-4 h-4" />
+                  <span>Ragam Aksara</span>
+                </div>
+                <div className="flex flex-wrap gap-2 text-xs">
+                  {['Puisi', 'Cerpen', 'Pantun', 'Novel', 'Cerbung'].map((kat) => (
+                    <Link
+                      key={kat}
+                      href={`/?kategori=${encodeURIComponent(kat)}`}
+                      className="px-3 py-1.5 rounded-xl bg-[#FAF8F5] border border-[#EAE2D9] text-[#4A4440] hover:text-[#C85A32] hover:border-[#C85A32]/40 transition font-medium"
+                    >
+                      {kat}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              {/* Widget 3: Apresiasi & Ruang Donasi */}
+              <div className="bg-[#FAF8F5] border border-[#E2D7CC] rounded-2xl p-5 space-y-2.5">
+                <div className="flex items-center gap-2 text-xs font-semibold text-[#1C1A19]">
+                  <Coffee className="w-4 h-4 text-[#C85A32]" />
+                  <span>Dukung Penulis Nusantara</span>
+                </div>
+                <p className="text-xs text-[#5C544F] leading-relaxed">
+                  Setiap bait tulisan memiliki jiwa. Anda dapat memberikan apresiasi kopi langsung ke halaman Trakteer penulis di setiap karya.
+                </p>
+              </div>
+
+            </aside>
+
+          </div>
 
         </div>
-
-      </div>
-    </main>
+      </main>
+    </SearchProvider>
   );
 }
