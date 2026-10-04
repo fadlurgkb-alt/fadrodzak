@@ -1,4 +1,4 @@
-import './globals.css';
+﻿import './globals.css';
 import type { Metadata, Viewport } from 'next';
 import { Cormorant_Garamond, Inter } from 'next/font/google';
 import BottomNav from '../components/BottomNav';
@@ -27,7 +27,7 @@ export const viewport: Viewport = {
 
 const SITE_URL = 'https://www.fadrodzak.my.id';
 const SITE_NAME = 'Fadrodzak';
-const DEFAULT_TITLE = 'Fadrodzak — Ruang Sastra & Komunitas Aksara';
+const DEFAULT_TITLE = 'Fadrodzak â€” Ruang Sastra & Komunitas Aksara';
 const DEFAULT_DESCRIPTION =
   'Fadrodzak adalah ruang sastra dan komunitas aksara untuk menulis, membaca, belajar, menemukan buku, dan bertumbuh bersama pecinta literasi.';
 
@@ -88,7 +88,7 @@ export const metadata: Metadata = {
         url: '/pwa-512x512.png',
         width: 512,
         height: 512,
-        alt: 'Logo Fadrodzak — Ruang Sastra & Komunitas Aksara',
+        alt: 'Logo Fadrodzak â€” Ruang Sastra & Komunitas Aksara',
       },
     ],
   },
@@ -163,7 +163,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdGlobal) }}
         />
       </head>
-      <body className="antialiased bg-[#FAF8F5] text-[#2C2A29] font-sans selection:bg-[#C85A32]/20 selection:text-[#2C2A29]">
+      <body className="antialiased bg-[#F5EFEB] text-[#2C2A29] font-sans selection:bg-[#C85A32]/20 selection:text-[#2C2A29]">
         {children}
         {/* Footer Minimalis */}
         <Footer />
