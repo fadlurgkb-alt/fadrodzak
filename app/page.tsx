@@ -76,12 +76,6 @@ export default async function HomePage({ searchParams }: PageProps) {
                   <BookOpen className="w-3.5 h-3.5" />
                   <span>Belajar</span>
                 </Link>
-                <Link
-                  href="/book-corner"
-                  className="px-3 py-1.5 rounded-xl hover:text-[#C85A32] hover:bg-[#FAF8F5] transition"
-                >
-                  Book Corner
-                </Link>
               </nav>
             </div>
 

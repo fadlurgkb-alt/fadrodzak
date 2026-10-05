@@ -20,12 +20,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.85,
     },
     {
-      url: `${BASE_URL}/book-corner`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.85,
-    },
-    {
       url: `${BASE_URL}/tentang-kami`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
@@ -52,13 +46,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   let karyaRoutes: MetadataRoute.Sitemap = [];
-  let bukuRoutes: MetadataRoute.Sitemap = [];
   let tutorialRoutes: MetadataRoute.Sitemap = [];
 
   try {
-    const [karyaRes, bukuRes, tutRes] = await Promise.all([
+    const [karyaRes, tutRes] = await Promise.all([
       pool.query(`SELECT id, created_at FROM karya ORDER BY created_at DESC LIMIT 5000`),
-      pool.query(`SELECT id, created_at FROM buku ORDER BY created_at DESC LIMIT 1000`).catch(() => ({ rows: [] })),
       pool.query(`SELECT id, created_at FROM tutorial ORDER BY created_at DESC LIMIT 1000`).catch(() => ({ rows: [] })),
     ]);
 
@@ -70,18 +62,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           lastModified: isNaN(d.getTime()) ? new Date() : d,
           changeFrequency: 'weekly' as const,
           priority: 0.9,
-        };
-      });
-    }
-
-    if (bukuRes.rows && bukuRes.rows.length > 0) {
-      bukuRoutes = bukuRes.rows.map((b) => {
-        const d = b.created_at ? new Date(b.created_at) : new Date();
-        return {
-          url: `${BASE_URL}/book-corner/${b.id}`,
-          lastModified: isNaN(d.getTime()) ? new Date() : d,
-          changeFrequency: 'monthly' as const,
-          priority: 0.8,
         };
       });
     }
@@ -101,5 +81,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.warn('[Sitemap] Notice query:', err);
   }
 
-  return [...staticRoutes, ...karyaRoutes, ...bukuRoutes, ...tutorialRoutes];
+  return [...staticRoutes, ...karyaRoutes, ...tutorialRoutes];
 }

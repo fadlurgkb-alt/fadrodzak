@@ -10,6 +10,7 @@ import PWAInstallButton from '../../components/PWAInstallButton';
 import StreakWidget from '../../components/StreakWidget';
 import KaryaSnippetPreview from '../../components/KaryaSnippetPreview';
 import RakBacaanClient from '../../components/RakBacaanClient';
+import ProfilTabsClient from '../../components/ProfilTabsClient';
 import { formatWaktuRelatif, formatWaktuLengkap } from '../../lib/date';
 import {
   ArrowLeft,
@@ -384,288 +385,153 @@ export default async function ProfilPage() {
     );
 
     return (
-      <main className="min-h-screen p-4 sm:p-8 max-w-4xl mx-auto pb-24 text-[#2C2A29]">
-        {/* Header Navigasi Profil */}
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#E8DED6]">
+      <main className="min-h-screen p-4 sm:p-6 max-w-2xl mx-auto pb-24 text-[#2C2A29]">
+        {/* Header Bersih Ala Aplikasi Mobile */}
+        <div className="flex items-center justify-between mb-5 pb-3 border-b border-[#E8DED6]">
           <Link
             href="/"
-            className="text-xs sm:text-sm text-[#C85A32] hover:underline flex items-center gap-1.5 font-medium"
+            className="text-xs sm:text-sm text-[#C85A32] hover:text-[#A94728] flex items-center gap-1.5 font-medium transition"
           >
-            <ArrowLeft className="w-3.5 h-3.5" /> Kembali ke Beranda
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Beranda</span>
           </Link>
-          <div className="flex items-center gap-2.5">
+
+          <span className="font-serif font-bold text-sm text-[#1C1A19]">
+            Profil Penulis
+          </span>
+
+          <div className="flex items-center gap-2">
             <Link
               href="/profil/edit"
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-[#E8DED6] bg-[#FFFDF9] text-[#6B625D] hover:text-[#C85A32] hover:border-[#C85A32] transition text-xs shadow-2xs"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-[#E8DED6] bg-[#FFFDF9] hover:border-[#C85A32] hover:text-[#C85A32] text-[#6B625D] text-xs font-medium transition shadow-2xs"
             >
               <Edit3 className="w-3.5 h-3.5" />
-              <span>Ubah Profil</span>
+              <span className="hidden sm:inline">Ubah</span>
             </Link>
             <Link
               href="/tulis"
-              className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl bg-[#C85A32] hover:bg-[#A94728] text-white transition text-xs font-medium shadow-2xs"
+              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#C85A32] hover:bg-[#A94728] text-white text-xs font-semibold shadow-2xs transition"
             >
               <PenLine className="w-3.5 h-3.5" />
-              <span>Tulis Karya</span>
+              <span className="hidden sm:inline">Tulis</span>
             </Link>
           </div>
         </div>
 
-        {/* Kartu Profil Utama */}
-        <div className="bg-[#FFFDF9] rounded-2xl border border-[#E8DED6] p-6 sm:p-8 shadow-2xs mb-8">
-          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left">
-            {/* Avatar Profil */}
-            {profil.foto_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={profil.foto_url}
-                alt={profil.nama}
-                className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border border-[#E8DED6] object-cover shadow-2xs"
-                referrerPolicy="no-referrer"
-              />
-            ) : (
-              <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#FAF8F5] text-[#C85A32] font-serif font-bold text-3xl flex items-center justify-center border border-[#E8DED6] shadow-2xs">
-                {profil.nama.charAt(0).toUpperCase()}
-              </div>
-            )}
+        {/* KARTU PROFIL UTAMA (Hero Card Ala App Native) */}
+        <div className="bg-[#FFFDF9] rounded-3xl border border-[#E8DED6] p-5 sm:p-6 shadow-2xs mb-6 relative overflow-hidden">
+          {/* Aksen Latar Belakang Halus */}
+          <div className="absolute top-0 right-0 w-36 h-36 bg-gradient-to-br from-[#C85A32]/10 to-transparent rounded-full blur-2xl pointer-events-none" />
 
-            <div className="flex-1">
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 mb-1.5">
-                <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#2C2A29]">
+          {/* Baris Atas: Avatar + Identitas Penulis */}
+          <div className="flex items-start gap-4 sm:gap-5 mb-4 relative z-10">
+            {/* Foto Profil / Inisial */}
+            <div className="relative shrink-0">
+              {profil.foto_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={profil.foto_url}
+                  alt={profil.nama}
+                  className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl border-2 border-[#FAF8F5] object-cover shadow-sm ring-1 ring-[#E8DED6]"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-[#FAF8F5] to-[#EFE7DE] text-[#C85A32] font-serif font-bold text-2xl flex items-center justify-center border-2 border-white shadow-sm ring-1 ring-[#E8DED6]">
+                  {profil.nama.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
+
+            <div className="flex-1 min-w-0 pt-0.5">
+              <div className="flex items-center gap-2 flex-wrap mb-1">
+                <h1 className="text-xl sm:text-2xl font-serif font-bold text-[#1C1A19] truncate leading-tight">
                   {profil.nama}
                 </h1>
-                <span className="px-2.5 py-0.5 rounded-lg text-xs bg-[#FAF8F5] text-[#C85A32] border border-[#E8DED6] font-medium">
+                <span className="text-[10px] font-bold text-[#C85A32] uppercase tracking-wider bg-[#C85A32]/10 px-2 py-0.5 rounded-full border border-[#C85A32]/20">
                   {profil.status_badge}
                 </span>
                 {gamification.role === 'admin' && (
-                  <span className="px-2.5 py-0.5 rounded-lg text-[11px] font-medium bg-[#FAF8F5] text-[#C85A32] border border-[#E8DED6]">
+                  <span className="text-[10px] font-bold text-white bg-[#C85A32] px-2 py-0.5 rounded-full">
                     Redaksi
                   </span>
                 )}
               </div>
 
               {profil.email && (
-                <p className="text-xs text-[#6B625D] font-mono mb-3">
+                <p className="text-xs text-[#7A6B63] font-mono truncate mb-2">
                   {profil.email}
                 </p>
               )}
 
-              <p className="text-sm font-serif text-[#45413E] italic leading-relaxed mb-4 max-w-xl">
+              {/* Bio Singkat */}
+              <p className="text-xs sm:text-sm font-serif italic text-[#4A4440] leading-relaxed line-clamp-2">
                 &ldquo;{profil.bio}&rdquo;
               </p>
-
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 text-xs text-[#6B625D]">
-                <span className="flex items-center gap-1.5 bg-[#FAF8F5] px-3 py-1.5 rounded-xl border border-[#E8DED6]">
-                  <BookOpen className="w-3.5 h-3.5 text-[#7A8B68]" /> {karyaList.length} Karya Diterbitkan
-                </span>
-                <span className="flex items-center gap-1.5 bg-[#FAF8F5] px-3 py-1.5 rounded-xl border border-[#E8DED6]">
-                  <Heart className="w-3.5 h-3.5 text-[#C85A32] fill-[#C85A32]/20" /> {totalSuka} Total Apresiasi
-                </span>
-                <a
-                  href={profil.link_donasi || 'https://trakteer.id/ahmad_rahman7/tip'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-[#C85A32] hover:underline bg-[#FAF8F5] px-3 py-1.5 rounded-xl border border-[#E8DED6] transition"
-                >
-                  <Coffee className="w-3.5 h-3.5" /> Dukung via Trakteer &rarr;
-                </a>
-              </div>
             </div>
           </div>
-        </div>
 
-        {/* Banner Pasang Aplikasi PWA */}
-        <div className="mb-6">
-          <PWAInstallButton variant="banner" />
-        </div>
-
-        {/* Hadiah Login Beruntung */}
-        <div className="mb-6">
-          <StreakWidget />
-        </div>
-
-        {/* Gamifikasi & XP Card */}
-        <div className="mb-8">
-          <GamificationCard
-            xp={gamification.xp}
-            role={gamification.role}
-            isDonatur={gamification.isDonatur}
-            reputasi={gamification.reputasi}
-          />
-        </div>
-
-        {/* Koleksi Lencana */}
-        <section className="mb-8">
-          <BadgeCollection badges={userBadges} />
-        </section>
-
-        {/* Rak Bacaan & Penanda Buku */}
-        <section className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-lg font-serif font-bold text-[#2C2A29] flex items-center gap-2">
-                <Bookmark className="w-4 h-4 text-[#C85A32]" />
-                Rak Bacaan &amp; Penanda Buku
-              </h2>
-              <p className="text-xs text-[#6B625D]">
-                Lanjutkan membaca karya dan bab novel yang telah Anda tandai
+          {/* Baris Statistik Ringkas (Bento Box 3 Kolom) */}
+          <div className="grid grid-cols-3 gap-2 py-3 px-3 rounded-2xl bg-[#FAF8F5] border border-[#E8DED6] mb-4 text-center">
+            <div className="border-r border-[#E8DED6]/70 pr-1">
+              <p className="font-serif font-bold text-base sm:text-lg text-[#1C1A19]">
+                {karyaList.length}
               </p>
+              <p className="text-[11px] text-[#7A6B63]">Karya Ditulis</p>
+            </div>
+            <div className="border-r border-[#E8DED6]/70 px-1">
+              <p className="font-serif font-bold text-base sm:text-lg text-[#C85A32]">
+                {totalSuka}
+              </p>
+              <p className="text-[11px] text-[#7A6B63]">Apresiasi Suka</p>
+            </div>
+            <div className="pl-1">
+              <p className="font-serif font-bold text-base sm:text-lg text-[#1C1A19]">
+                {gamification.xp}
+              </p>
+              <p className="text-[11px] text-[#7A6B63]">Poin Aksara</p>
             </div>
           </div>
-          <RakBacaanClient />
-        </section>
 
-        {/* Daftar Karya Pribadi */}
-        <section>
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h2 className="text-lg font-serif font-bold text-[#2C2A29]">
-                Karya Sastra Saya
-              </h2>
-              <p className="text-xs text-[#6B625D]">
-                Kelola tulisan dan pantau apresiasi dari para pembaca
-              </p>
-            </div>
+          {/* Tombol Aksi Cepat */}
+          <div className="flex items-center gap-2 flex-wrap">
             <Link
               href="/tulis"
-              className="inline-flex items-center gap-1 text-xs font-medium text-[#C85A32] hover:underline"
+              className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-[#C85A32] hover:bg-[#A94728] text-white text-xs font-semibold shadow-2xs transition"
             >
-              <PenLine className="w-3 h-3" />
+              <PenLine className="w-3.5 h-3.5" />
               <span>Tulis Karya Baru</span>
             </Link>
-          </div>
 
-          {karyaList.length === 0 ? (
-            <div className="bg-[#FFFDF9] rounded-2xl border border-dashed border-[#E8DED6] p-10 text-center">
-              <Feather className="w-8 h-8 text-[#C85A32] mx-auto mb-3 opacity-60" />
-              <h3 className="text-base font-serif font-bold text-[#2C2A29] mb-1">
-                Belum ada karya yang diterbitkan
-              </h3>
-              <p className="text-xs text-[#6B625D] mb-5 max-w-md mx-auto leading-relaxed">
-                Setiap bait puisi dan jalinan kisah bermula dari keberanian menuangkan kata pertama.
-              </p>
-              <Link
-                href="/tulis"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#C85A32] hover:bg-[#A94728] text-white text-xs font-medium shadow-2xs transition"
+            <Link
+              href="/profil/edit"
+              className="inline-flex items-center justify-center gap-1.5 py-2.5 px-3.5 rounded-xl border border-[#E8DED6] bg-[#FFFDF9] hover:bg-[#FAF8F5] text-[#2C2A29] text-xs font-semibold shadow-2xs transition"
+            >
+              <Edit3 className="w-3.5 h-3.5" />
+              <span>Edit Profil</span>
+            </Link>
+
+            {profil.link_donasi && (
+              <a
+                href={profil.link_donasi}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-1.5 py-2.5 px-3.5 rounded-xl border border-[#E8DED6] bg-[#FFFDF9] hover:bg-[#FAF8F5] text-[#C85A32] text-xs font-semibold shadow-2xs transition"
+                title="Buka Trakteer Penulis"
               >
-                <PenLine className="w-3.5 h-3.5" />
-                <span>Terbitkan Karya Pertama</span>
-              </Link>
-            </div>
-          ) : (
-            <div className="space-y-3.5">
-              {karyaList.map((karya) => {
-                const isCerita =
-                  (karya.kategori || '').toLowerCase().includes('novel') ||
-                  (karya.kategori || '').toLowerCase().includes('cerbung') ||
-                  Boolean(karya.nama_cerita);
-                const nextBabNumber = (Number(karya.nomor_bab) || 1) + 1;
-                const seriesName = karya.nama_cerita || karya.judul;
-
-                return (
-                  <article
-                    key={karya.id}
-                    className="bg-[#FFFDF9] p-5 sm:p-6 rounded-2xl border border-[#E8DED6] shadow-2xs transition"
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
-                      <div>
-                        <div className="flex items-center gap-2 flex-wrap mb-1">
-                          <span className="text-[11px] font-semibold text-[#C85A32] uppercase tracking-wider">
-                            {karya.kategori}
-                          </span>
-                          {karya.nomor_bab && (
-                            <span className="text-[10px] font-serif font-bold px-2 py-0.5 rounded bg-[#FAF0E6] text-[#C85A32] border border-[#E8DEC0]">
-                              Bab {karya.nomor_bab}
-                            </span>
-                          )}
-                          {karya.nama_cerita && karya.nama_cerita !== karya.judul && (
-                            <span className="text-[11px] text-[#6B625D] font-serif">
-                              Seri: {karya.nama_cerita}
-                            </span>
-                          )}
-                        </div>
-                        <h3 className="text-lg font-serif font-bold text-[#2C2A29]">
-                          <Link
-                            href={`/karya/${karya.id}`}
-                            className="hover:text-[#C85A32] transition"
-                          >
-                            {karya.judul}
-                          </Link>
-                        </h3>
-                      </div>
-
-                      <div className="flex items-center gap-2 flex-wrap">
-                        {/* Tombol Lanjut Bab untuk Novel & Cerbung */}
-                        {isCerita && (
-                          <Link
-                            href={`/tulis?nama_cerita=${encodeURIComponent(seriesName)}&nomor_bab=${nextBabNumber}&kategori=Novel+%26+Cerbung&sinopsis=${encodeURIComponent(karya.sinopsis || '')}`}
-                            className="text-xs text-white bg-[#C85A32] hover:bg-[#A94728] px-3 py-1.5 rounded-xl font-medium shadow-2xs transition inline-flex items-center gap-1.5 shrink-0"
-                            title="Tulis bab selanjutnya dari kisah ini"
-                          >
-                            <Plus className="w-3.5 h-3.5" />
-                            <span>+ Bab {nextBabNumber}</span>
-                          </Link>
-                        )}
-
-                        {/* Tombol Edit Naskah */}
-                        <Link
-                          href={`/karya/${karya.id}/edit`}
-                          className="text-xs text-[#2C2A29] hover:text-[#C85A32] px-3 py-1.5 rounded-xl bg-[#FAF8F5] border border-[#E8DED6] hover:border-[#C85A32] transition inline-flex items-center gap-1 font-medium"
-                          title="Edit dan perbaiki isi naskah karya ini"
-                        >
-                          <Edit3 className="w-3 h-3" />
-                          <span>Edit</span>
-                        </Link>
-
-                        {/* Tombol Baca */}
-                        <Link
-                          href={`/karya/${karya.id}`}
-                          className="text-xs text-[#6B625D] hover:text-[#C85A32] px-2.5 py-1.5 rounded-xl bg-[#FAF8F5] border border-[#E8DED6] transition"
-                          title="Lihat naskah di ruang baca"
-                        >
-                          Baca
-                        </Link>
-
-                        <form action={hapusKarya}>
-                          <input type="hidden" name="karyaId" value={karya.id} />
-                          <button
-                            type="submit"
-                            className="text-xs text-[#6B625D] hover:text-red-700 px-2.5 py-1.5 rounded-xl hover:bg-red-50 transition cursor-pointer"
-                            title="Hapus karya ini"
-                          >
-                            Hapus
-                          </button>
-                        </form>
-                      </div>
-                    </div>
-
-                  <KaryaSnippetPreview
-                    isiTulisan={karya.isi_tulisan || ''}
-                    kategori={karya.kategori || 'Puisi'}
-                    maxPoemLines={3}
-                  />
-
-                  <div className="flex items-center gap-4 text-xs text-[#6B625D] pt-3 border-t border-[#E8DED6]">
-                    <span className="flex items-center gap-1.5">
-                      <Heart className="w-3.5 h-3.5 text-[#C85A32] fill-[#C85A32]/20" /> {karya.total_likes ?? karya.jumlah_suka ?? 0} Suka
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <MessageSquare className="w-3.5 h-3.5 text-[#6B625D]" /> {karya.total_komentar ?? karya.jumlah_komentar ?? 0} Komentar
-                    </span>
-                    <time
-                      dateTime={toSafeISOString(karya.created_at)}
-                      className="ml-auto text-[11px] text-[#6B625D] hover:text-[#C85A32] transition"
-                      title={formatWaktuLengkap(karya.created_at)}
-                    >
-                      {formatWaktuRelatif(karya.created_at)}
-                    </time>
-                  </div>
-                </article>
-              );
-            })}
+                <Coffee className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Trakteer</span>
+              </a>
+            )}
           </div>
-          )}
-        </section>
+        </div>
+
+        {/* KONTEN TABS TERSEGMENTASI (Karya Saya / Rak Bacaan / Prestasi) */}
+        <ProfilTabsClient
+          karyaList={karyaList}
+          gamification={gamification}
+          userBadges={userBadges}
+          onHapusKarya={hapusKarya}
+        />
       </main>
     );
   } catch (pageError) {
