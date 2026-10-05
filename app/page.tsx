@@ -8,7 +8,7 @@ import HeaderSearchBar from '../components/HeaderSearchBar';
 import LastReadWidget from '../components/LastReadWidget';
 import { SearchProvider } from '../components/SearchContext';
 import { revalidatePath } from 'next/cache';
-import { BookOpen, PenLine, Compass, Coffee } from 'lucide-react';
+import { BookOpen, PenLine, Compass, Coffee, UserRound } from 'lucide-react';
 
 export const revalidate = 30;
 
@@ -63,18 +63,44 @@ export default async function HomePage({ searchParams }: PageProps) {
           
           {/* Header Baris Atas: Logo, Search Bar, & Tombol Navigasi Desktop */}
           <div className="flex items-center justify-between gap-4 mb-6 pb-4 border-b border-[#EAE2D9]">
-            <Link href="/" className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1A19] tracking-tight">
-              Fadrodzak
-            </Link>
+            <div className="flex items-center gap-6">
+              <Link href="/" className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1A19] tracking-tight">
+                Fadrodzak
+              </Link>
+              {/* Menu Navigasi Desktop (Hanya tampil di Laptop/PC agar layar luas tetap fungsional) */}
+              <nav className="hidden md:flex items-center gap-1 text-xs font-medium text-[#5C544F]">
+                <Link
+                  href="/belajar"
+                  className="px-3 py-1.5 rounded-xl hover:text-[#C85A32] hover:bg-[#FAF8F5] transition flex items-center gap-1.5"
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>Belajar</span>
+                </Link>
+                <Link
+                  href="/book-corner"
+                  className="px-3 py-1.5 rounded-xl hover:text-[#C85A32] hover:bg-[#FAF8F5] transition"
+                >
+                  Book Corner
+                </Link>
+              </nav>
+            </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <HeaderSearchBar />
               <Link
                 href="/tulis"
-                className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 bg-[#C85A32] hover:bg-[#A94728] text-white rounded-xl text-xs font-medium shadow-xs transition"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 bg-[#C85A32] hover:bg-[#A94728] text-white rounded-xl text-xs font-medium shadow-xs transition"
               >
                 <PenLine className="w-3.5 h-3.5" />
                 <span>Tulis</span>
+              </Link>
+              <Link
+                href="/profil"
+                className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-[#E8DED6] bg-[#FAF8F5] hover:border-[#C85A32] hover:text-[#C85A32] text-[#2C2A29] text-xs font-medium transition shadow-2xs"
+                title="Buka Profil & Tulisan Pribadi"
+              >
+                <UserRound className="w-3.5 h-3.5 text-[#C85A32]" />
+                <span>Profil</span>
               </Link>
             </div>
           </div>
