@@ -7,6 +7,7 @@ import { getCurrentUser } from '../../lib/auth-server';
 import GamificationCard from '../../components/GamificationCard';
 import BadgeCollection from '../../components/BadgeCollection';
 import PWAInstallButton from '../../components/PWAInstallButton';
+import LogoutButton from '../../components/LogoutButton';
 import StreakWidget from '../../components/StreakWidget';
 import KaryaSnippetPreview from '../../components/KaryaSnippetPreview';
 import RakBacaanClient from '../../components/RakBacaanClient';
@@ -243,52 +244,98 @@ export default async function ProfilPage() {
       link_donasi: '',
     };
 
-    try {
-      const { rows: profilRows } = await pool.query(
-        `SELECT user_id, email, nama, foto_url, status_badge, bio, link_donasi
-         FROM profil_pengguna
-         WHERE user_id = $1
-         LIMIT 1`,
-        [firebaseUid]
-      );
+    // Eksekusi semua query secara paralel (Promise.all) untuk menghilangkan jeda 6-12 detik
+    const [profilRes, gamifRes, badgeRes, karyaRes] = await Promise.all([
+      pool
+        .query(
+          `SELECT user_id, email, nama, foto_url, status_badge, bio, link_donasi
+           FROM profil_pengguna
+           WHERE user_id = $1
+           LIMIT 1`,
+          [firebaseUid]
+        )
+        .catch((err) => {
+          console.warn('[Profil] Notice query profil:', err);
+          return { rows: [] };
+        }),
+      pool
+        .query(
+          `SELECT xp, role, is_donatur, reputasi
+           FROM user_gamification
+           WHERE user_id = $1
+           LIMIT 1`,
+          [firebaseUid]
+        )
+        .catch((err) => {
+          console.warn('[Profil] Notice query gamifikasi:', err);
+          return { rows: [] };
+        }),
+      pool
+        .query(
+          `SELECT b.id, b.nama, b.deskripsi, b.icon, b.rarity
+           FROM badges b
+           INNER JOIN user_badges ub ON ub.badge_id = b.id
+           WHERE ub.user_id = $1
+           ORDER BY ub.didapatkan_pada DESC`,
+          [firebaseUid]
+        )
+        .catch((err) => {
+          console.warn('[Profil] Notice query badges:', err);
+          return { rows: [] };
+        }),
+      pool
+        .query(
+          `SELECT id, judul, kategori, isi_tulisan, user_id, created_at,
+                  nomor_bab, nama_cerita, sinopsis, status_cerita,
+                  COALESCE(jumlah_suka, 0) as total_likes,
+                  COALESCE(jumlah_komentar, 0) as total_komentar,
+                  COALESCE(jumlah_suka, 0) as jumlah_suka,
+                  COALESCE(jumlah_komentar, 0) as jumlah_komentar
+           FROM karya
+           WHERE user_id = $1
+           ORDER BY created_at DESC`,
+          [firebaseUid]
+        )
+        .catch((err) => {
+          console.warn('[Profil] Notice query karya:', err);
+          return { rows: [] };
+        }),
+    ]);
 
-      if (profilRows && profilRows.length > 0) {
-        const rawBadge = String(profilRows[0].status_badge || 'Pelajar Sastra');
-        const isCorrupted = rawBadge.startsWith('data:');
-        const safeBadge = isCorrupted ? 'Pelajar Sastra' : rawBadge;
-        const safeFoto = profilRows[0].foto_url || (isCorrupted ? rawBadge : defaultFoto);
+    const profilRows = profilRes.rows || [];
+    if (profilRows.length > 0) {
+      const rawBadge = String(profilRows[0].status_badge || 'Pelajar Sastra');
+      const isCorrupted = rawBadge.startsWith('data:');
+      const safeBadge = isCorrupted ? 'Pelajar Sastra' : rawBadge;
+      const safeFoto = profilRows[0].foto_url || (isCorrupted ? rawBadge : defaultFoto);
 
-        profil = {
-          user_id: firebaseUid,
-          email: profilRows[0].email || currentUser.email || '',
-          nama: profilRows[0].nama || defaultNama,
-          foto_url: safeFoto,
-          status_badge: safeBadge,
-          bio: profilRows[0].bio || 'Pena baru di ruang sastra Fadrodzak.',
-          link_donasi: profilRows[0].link_donasi || '',
-        };
-      } else {
-        try {
-          await pool.query(
-            `INSERT INTO profil_pengguna (user_id, email, nama, foto_url, status_badge, bio, link_donasi)
-             VALUES ($1, $2, $3, $4, $5, $6, $7)
-             ON CONFLICT (user_id) DO NOTHING`,
-            [
-              firebaseUid,
-              currentUser.email || '',
-              defaultNama,
-              defaultFoto,
-              'Pelajar Sastra',
-              'Pena baru di ruang sastra Fadrodzak.',
-              '',
-            ]
-          );
-        } catch (insertErr) {
-          console.warn('[Profil] Notice inisialisasi profil_pengguna:', insertErr);
-        }
-      }
-    } catch (err) {
-      console.warn('[Profil] Notice membaca profil_pengguna:', err);
+      profil = {
+        user_id: firebaseUid,
+        email: profilRows[0].email || currentUser.email || '',
+        nama: profilRows[0].nama || defaultNama,
+        foto_url: safeFoto,
+        status_badge: safeBadge,
+        bio: profilRows[0].bio || 'Pena baru di ruang sastra Fadrodzak.',
+        link_donasi: profilRows[0].link_donasi || '',
+      };
+    } else {
+      // Inisialisasi profil di background tanpa memblokir respon
+      pool
+        .query(
+          `INSERT INTO profil_pengguna (user_id, email, nama, foto_url, status_badge, bio, link_donasi)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)
+           ON CONFLICT (user_id) DO NOTHING`,
+          [
+            firebaseUid,
+            currentUser.email || '',
+            defaultNama,
+            defaultFoto,
+            'Pelajar Sastra',
+            'Pena baru di ruang sastra Fadrodzak.',
+            '',
+          ]
+        )
+        .catch((insertErr) => console.warn('[Profil] Notice async profil:', insertErr));
     }
 
     let gamification = {
@@ -299,85 +346,37 @@ export default async function ProfilPage() {
       accountStatus: 'active',
     };
 
-    try {
-      const { rows: gamifRows } = await pool.query(
-        `SELECT xp, role, is_donatur, reputasi
-         FROM user_gamification
-         WHERE user_id = $1
-         LIMIT 1`,
-        [firebaseUid]
-      );
-
-      if (gamifRows && gamifRows.length > 0) {
-        gamification = {
-          xp: Number(gamifRows[0].xp || 0),
-          role: String(gamifRows[0].role || 'user'),
-          isDonatur: Boolean(gamifRows[0].is_donatur),
-          reputasi: Number(gamifRows[0].reputasi || 0),
-          accountStatus: 'active',
-        };
-      } else {
-        try {
-          await pool.query(
-            `INSERT INTO user_gamification (user_id, xp, role, is_donatur, reputasi)
-             VALUES ($1, 0, 'user', false, 0)
-             ON CONFLICT (user_id) DO NOTHING`,
-            [firebaseUid]
-          );
-        } catch (insertGamifErr) {
-          console.warn('[Profil] Notice inisialisasi gamifikasi:', insertGamifErr);
-        }
-      }
-    } catch (err) {
-      console.warn('[Profil] Notice membaca user_gamification:', err);
-    }
-
-    let userBadges: BadgeItem[] = [];
-    try {
-      const { rows: badgeRows } = await pool.query(
-        `SELECT b.id, b.nama, b.deskripsi, b.icon, b.rarity
-         FROM badges b
-         INNER JOIN user_badges ub ON ub.badge_id = b.id
-         WHERE ub.user_id = $1
-         ORDER BY ub.didapatkan_pada DESC`,
-        [firebaseUid]
-      );
-      userBadges = ((badgeRows as BadgeItem[]) || []).map((b) => ({
-        id: Number(b.id || 0),
-        nama: String(b.nama || 'Lencana Sastra'),
-        deskripsi: b.deskripsi ? String(b.deskripsi) : null,
-        icon: String(b.icon || 'medal'),
-        rarity: String(b.rarity || 'common'),
-      }));
-    } catch (err) {
-      console.warn('[Profil] Notice membaca user_badges:', err);
-      userBadges = [];
-    }
-
-    let karyaList: KaryaRow[] = [];
-    try {
-      const { rows: karyaRows } = await pool.query(
-        `SELECT k.*,
-           GREATEST(COALESCE(k.jumlah_suka, 0), COALESCE((SELECT COUNT(*)::int FROM likes l WHERE l.karya_id = k.id), 0)) AS total_likes,
-           GREATEST(COALESCE(k.jumlah_komentar, 0), COALESCE((SELECT COUNT(*)::int FROM komentar c WHERE c.karya_id = k.id), 0)) AS total_komentar
-         FROM karya k
-         WHERE k.user_id = $1
-         ORDER BY k.created_at DESC`,
-        [firebaseUid]
-      );
-      karyaList = Array.isArray(karyaRows) ? (karyaRows as KaryaRow[]) : [];
-    } catch (err) {
-      console.warn('[Profil] Notice membaca karya milik user dengan subquery:', err);
-      try {
-        const { rows: simpleRows } = await pool.query(
-          'SELECT * FROM karya WHERE user_id = $1 ORDER BY created_at DESC',
+    const gamifRows = gamifRes.rows || [];
+    if (gamifRows.length > 0) {
+      gamification = {
+        xp: Number(gamifRows[0].xp || 0),
+        role: String(gamifRows[0].role || 'user'),
+        isDonatur: Boolean(gamifRows[0].is_donatur),
+        reputasi: Number(gamifRows[0].reputasi || 0),
+        accountStatus: 'active',
+      };
+    } else {
+      // Inisialisasi gamifikasi di background tanpa memblokir respon
+      pool
+        .query(
+          `INSERT INTO user_gamification (user_id, xp, role, is_donatur, reputasi)
+           VALUES ($1, 0, 'user', false, 0)
+           ON CONFLICT (user_id) DO NOTHING`,
           [firebaseUid]
-        );
-        karyaList = Array.isArray(simpleRows) ? (simpleRows as KaryaRow[]) : [];
-      } catch {
-        karyaList = [];
-      }
+        )
+        .catch((insertGamifErr) => console.warn('[Profil] Notice async gamif:', insertGamifErr));
     }
+
+    const badgeRows = badgeRes.rows || [];
+    const userBadges: BadgeItem[] = badgeRows.map((b) => ({
+      id: Number(b.id || 0),
+      nama: String(b.nama || 'Lencana Sastra'),
+      deskripsi: b.deskripsi ? String(b.deskripsi) : null,
+      icon: String(b.icon || 'medal'),
+      rarity: String(b.rarity || 'common'),
+    }));
+
+    const karyaList: KaryaRow[] = (karyaRes.rows || []) as KaryaRow[];
 
     const totalSuka = (karyaList || []).reduce(
       (sum, k) => sum + (k?.total_likes ?? k?.jumlah_suka ?? 0),
@@ -400,21 +399,22 @@ export default async function ProfilPage() {
             Profil Penulis
           </span>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             <Link
               href="/profil/edit"
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-[#E8DED6] bg-[#FFFDF9] hover:border-[#C85A32] hover:text-[#C85A32] text-[#6B625D] text-xs font-medium transition shadow-2xs"
+              className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl border border-[#E8DED6] bg-[#FFFDF9] hover:border-[#C85A32] hover:text-[#C85A32] text-[#6B625D] text-xs font-medium transition shadow-2xs"
             >
               <Edit3 className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Ubah</span>
             </Link>
             <Link
               href="/tulis"
-              className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-[#C85A32] hover:bg-[#A94728] text-white text-xs font-semibold shadow-2xs transition"
+              className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl bg-[#C85A32] hover:bg-[#A94728] text-white text-xs font-semibold shadow-2xs transition"
             >
               <PenLine className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Tulis</span>
             </Link>
+            <LogoutButton className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl border border-red-200 bg-red-50/80 hover:bg-red-100 text-red-600 hover:text-red-700 text-xs font-medium transition shadow-2xs cursor-pointer" />
           </div>
         </div>
 
@@ -496,7 +496,7 @@ export default async function ProfilPage() {
           <div className="flex items-center gap-2 flex-wrap">
             <Link
               href="/tulis"
-              className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-[#C85A32] hover:bg-[#A94728] text-white text-xs font-semibold shadow-2xs transition"
+              className="flex-1 min-w-[140px] inline-flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl bg-[#C85A32] hover:bg-[#A94728] text-white text-xs font-semibold shadow-2xs transition"
             >
               <PenLine className="w-3.5 h-3.5" />
               <span>Tulis Karya Baru</span>
@@ -522,6 +522,8 @@ export default async function ProfilPage() {
                 <span className="hidden sm:inline">Trakteer</span>
               </a>
             )}
+
+            <LogoutButton />
           </div>
         </div>
 
@@ -545,7 +547,7 @@ export default async function ProfilPage() {
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Kembali ke Beranda
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Link
               href="/tulis"
               className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl bg-[#C85A32] hover:bg-[#A94728] text-white transition text-xs font-medium shadow-2xs"
@@ -553,6 +555,7 @@ export default async function ProfilPage() {
               <PenLine className="w-3.5 h-3.5" />
               <span>Tulis Karya</span>
             </Link>
+            <LogoutButton />
           </div>
         </div>
 

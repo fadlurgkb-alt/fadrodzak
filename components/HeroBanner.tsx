@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import Link from 'next/link';
@@ -6,44 +6,44 @@ import { PenLine, BookOpen, Sparkles, Quote, Compass } from 'lucide-react';
 
 export default function HeroBanner() {
   return (
-    <section className="mb-10 pb-8 border-b border-[#EAE2D9]">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+    <section className="mb-4 pb-4 sm:mb-8 sm:pb-8 border-b border-[#EAE2D9]">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-12 items-center">
         
         {/* Kolom Kiri: Headline & Call-to-Action Utama */}
-        <div className="lg:col-span-7 space-y-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C85A32]/10 border border-[#C85A32]/20 text-[#C85A32] text-xs font-serif tracking-wider uppercase">
+        <div className="lg:col-span-7 space-y-2.5 sm:space-y-4">
+          <div className="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C85A32]/10 border border-[#C85A32]/20 text-[#C85A32] text-xs font-serif tracking-wider uppercase">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Ruang Sastra & Komunitas Aksara Nusantara</span>
+            <span>Ruang Sastra &amp; Komunitas Aksara Nusantara</span>
           </div>
 
-          <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-[#1C1A19] tracking-tight leading-[1.12]">
+          <h1 className="font-serif text-2xl sm:text-4xl lg:text-5xl font-bold text-[#1C1A19] tracking-tight leading-snug">
             Fadrodzak
           </h1>
 
-          <p className="font-serif italic text-lg sm:text-xl text-[#C85A32]">
+          <p className="font-serif italic text-xs sm:text-base lg:text-lg text-[#C85A32] leading-relaxed">
             &ldquo;Aksara yang hidup adalah aksara yang dirawat bersama.&rdquo;
           </p>
 
-          <p className="text-base sm:text-lg text-[#4A4440] leading-relaxed max-w-xl font-sans">
+          <p className="hidden sm:block text-sm sm:text-base text-[#4A4440] leading-relaxed max-w-xl font-sans">
             Ruang tenang bagi para penenun sajak, penulis cerpen, dan penikmat kata. Terbitkan karya Anda, telusuri ribuan bait bermakna, dan temukan kawan bertukar tafsir.
           </p>
 
           {/* Tombol Aksi Editorial */}
-          <div className="pt-2 flex flex-wrap items-center gap-3">
+          <div className="pt-1 flex items-center gap-2 sm:gap-3">
             <Link
               href="/tulis"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#C85A32] hover:bg-[#A94728] text-white rounded-xl text-sm font-medium shadow-xs transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-5 sm:py-2.5 bg-[#C85A32] hover:bg-[#A94728] text-white rounded-xl text-xs sm:text-sm font-medium shadow-2xs transition cursor-pointer"
             >
-              <PenLine className="w-4 h-4" />
-              <span>Mulai Menulis Karya</span>
+              <PenLine className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span>Mulai Menulis</span>
             </Link>
 
             <Link
               href="/belajar"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FFFDF9] hover:bg-white text-[#2C2A29] hover:text-[#C85A32] border border-[#D8CEC4] hover:border-[#C85A32]/60 rounded-xl text-sm font-medium shadow-2xs transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 sm:px-5 sm:py-2.5 bg-[#FFFDF9] hover:bg-white text-[#2C2A29] hover:text-[#C85A32] border border-[#D8CEC4] hover:border-[#C85A32]/60 rounded-xl text-xs sm:text-sm font-medium shadow-2xs transition cursor-pointer"
             >
-              <Compass className="w-4 h-4 text-[#C85A32]" />
-              <span>Klinik Bedah Karya</span>
+              <Compass className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#C85A32]" />
+              <span>Klinik Sastra</span>
             </Link>
           </div>
         </div>

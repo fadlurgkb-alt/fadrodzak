@@ -97,7 +97,7 @@ export default async function HomePage({ searchParams }: PageProps) {
           <HeroBanner />
 
           {/* 2. Banner Pasang Aplikasi Tipis */}
-          <div className="mb-8">
+          <div className="mb-4 sm:mb-6">
             <PWAInstallButton variant="banner" />
           </div>
 
