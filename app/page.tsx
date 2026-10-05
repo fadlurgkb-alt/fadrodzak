@@ -5,6 +5,7 @@ import HeroBanner from '../components/HeroBanner';
 import KaryaSearchFeed, { KaryaRow } from '../components/KaryaSearchFeed';
 import PWAInstallButton from '../components/PWAInstallButton';
 import HeaderSearchBar from '../components/HeaderSearchBar';
+import HeaderProfileButton from '../components/HeaderProfileButton';
 import LastReadWidget from '../components/LastReadWidget';
 import { SearchProvider } from '../components/SearchContext';
 import { revalidatePath } from 'next/cache';
@@ -88,14 +89,7 @@ export default async function HomePage({ searchParams }: PageProps) {
                 <PenLine className="w-3.5 h-3.5" />
                 <span>Tulis</span>
               </Link>
-              <Link
-                href="/profil"
-                className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-[#E8DED6] bg-[#FAF8F5] hover:border-[#C85A32] hover:text-[#C85A32] text-[#2C2A29] text-xs font-medium transition shadow-2xs"
-                title="Buka Profil & Tulisan Pribadi"
-              >
-                <UserRound className="w-3.5 h-3.5 text-[#C85A32]" />
-                <span>Profil</span>
-              </Link>
+              <HeaderProfileButton />
             </div>
           </div>
 

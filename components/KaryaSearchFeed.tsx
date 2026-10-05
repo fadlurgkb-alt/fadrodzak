@@ -289,9 +289,12 @@ export default function KaryaSearchFeed({
                         ? `/profil/${encodeURIComponent(karya.user_id)}`
                         : '#'
                     }
-                    className="w-9 h-9 rounded-full bg-[#FAF8F5] border border-[#E8DED6] flex items-center justify-center text-[#C85A32] font-semibold text-xs hover:border-[#C85A32] transition shrink-0"
+                    className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-[#FAF8F5] to-[#EFE7DE] border border-[#E8DED6] flex items-center justify-center text-[#C85A32] font-serif font-bold text-sm sm:text-base hover:border-[#C85A32] hover:ring-2 hover:ring-[#C85A32]/30 transition-all duration-200 shrink-0 shadow-2xs group"
+                    title={`Lihat profil penulis ${karya.nama_pengguna}`}
                   >
-                    {karya.nama_pengguna.charAt(0).toUpperCase()}
+                    <span className="group-hover:scale-105 transition-transform">
+                      {karya.nama_pengguna.charAt(0).toUpperCase()}
+                    </span>
                   </Link>
 
                   <div className="flex-1 min-w-0">
