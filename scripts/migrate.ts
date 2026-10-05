@@ -231,12 +231,18 @@ const DDL_STATEMENTS: string[] = [
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (blocker_user_id, blocked_user_id)
   )`,
+  `ALTER TABLE karya ADD COLUMN IF NOT EXISTS event_tag TEXT`,
   `INSERT INTO badges (kode, nama, deskripsi, icon, rarity) VALUES
     ('pena_mula', 'Pena Mula', 'Menerbitkan karya sastra pertama Anda.', '🪶', 'common'),
     ('pengrajin_kata', 'Pengrajin Kata', 'Telah menghasilkan 5 karya sastra.', '📜', 'uncommon'),
     ('penjaga_nyala', 'Penjaga Nyala', 'Streak membaca selama 7 hari berturut-turut.', '🔥', 'rare'),
     ('suara_sahdu', 'Suara Syahdu', 'Merekam dan mengunggah audio pembacaan puisi.', '🎙️', 'rare'),
-    ('maestro_aksara', 'Maestro Aksara', 'Mencapai reputasi tinggi dan 30 hari aktif.', '👑', 'legendary')
+    ('maestro_aksara', 'Maestro Aksara', 'Mencapai reputasi tinggi dan 30 hari aktif.', '👑', 'legendary'),
+    ('perintis_fadrodzak', 'Perintis Fadrodzak', '500 Penulis & Pembaca Perintis Generasi Awal Fadrodzak.', '🪶', 'legendary'),
+    ('peserta_sayembara_1', 'Peserta Sayembara I', 'Telah mengirimkan karya resmi pada Sayembara Perintis Fadrodzak.', '✒️', 'rare'),
+    ('pembaca_budiman', 'Pembaca Budiman', 'Menyumbangkan ulasan & telaah bermakna bagi sesama penulis.', '📖', 'uncommon'),
+    ('finalis_aksara', 'Finalis Aksara', 'Karya terpilih masuk jajaran finalis kurasi sayembara.', '🌿', 'rare'),
+    ('juara_sayembara_1', 'Pemenang Sayembara', 'Peraih juara Sayembara Sastra Fadrodzak.', '🏆', 'legendary')
    ON CONFLICT (kode) DO NOTHING`,
 ];
 

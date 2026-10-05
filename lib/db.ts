@@ -1,4 +1,4 @@
-﻿/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Pool } from 'pg';
 import fs from 'fs';
 import path from 'path';
@@ -23,6 +23,7 @@ interface KaryaItem {
   nama_cerita?: string | null;
   sinopsis?: string | null;
   status_cerita?: string | null;
+  event_tag?: string | null;
   created_at: Date;
 }
 
@@ -390,6 +391,11 @@ const initialBadges: BadgeItem[] = [
   { id: 2, kode: 'penyair_muda', nama: 'Penyair Muda', deskripsi: 'Mempublikasikan 3 karya puisi', icon: 'ðŸ“œ', rarity: 'rare' },
   { id: 3, kode: 'pembaca_setia', nama: 'Pembaca Setia', deskripsi: 'Aktif mengulas dan memberi tanggapan', icon: 'ðŸ“–', rarity: 'common' },
   { id: 4, kode: 'sastrawan', nama: 'Sastrawan Pilihan', deskripsi: 'Karya terpilih dalam kurasi redaksi', icon: 'ðŸ‘‘', rarity: 'epic' },
+  { id: 5, kode: 'perintis_fadrodzak', nama: 'Perintis Fadrodzak', deskripsi: '500 Penulis & Pembaca Perintis Generasi Awal Fadrodzak.', icon: '🪶', rarity: 'legendary' },
+  { id: 6, kode: 'peserta_sayembara_1', nama: 'Peserta Sayembara I', deskripsi: 'Telah mengirimkan karya resmi pada Sayembara Perintis Fadrodzak.', icon: '✒️', rarity: 'rare' },
+  { id: 7, kode: 'pembaca_budiman', nama: 'Pembaca Budiman', deskripsi: 'Menyumbangkan ulasan & telaah bermakna bagi sesama penulis.', icon: '📖', rarity: 'uncommon' },
+  { id: 8, kode: 'finalis_aksara', nama: 'Finalis Aksara', deskripsi: 'Karya terpilih masuk jajaran finalis kurasi sayembara.', icon: '🌿', rarity: 'rare' },
+  { id: 9, kode: 'juara_sayembara_1', nama: 'Pemenang Sayembara', deskripsi: 'Peraih juara Sayembara Sastra Fadrodzak.', icon: '🏆', rarity: 'legendary' },
 ];
 
 const initialUserBadges: UserBadgeItem[] = [
@@ -844,6 +850,7 @@ async function runMemoryQuery(text: string, params: any[] = []): Promise<{ rows:
       nama_cerita: nama_cerita,
       sinopsis: sinopsis,
       status_cerita: status_cerita,
+      event_tag: (upper.includes('EVENT_TAG') || upper.includes('SAYEMBARA')) ? 'sayembara-hujan' : null,
       created_at: created_at,
     };
     memoryStore.karyas.unshift(newItem);

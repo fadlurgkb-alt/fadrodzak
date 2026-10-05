@@ -18,6 +18,7 @@ export default async function TulisKaryaPage({
   const queryBab = typeof query.nomor_bab === 'string' ? query.nomor_bab : (typeof query.bab === 'string' ? query.bab : '');
   const querySinopsis = typeof query.sinopsis === 'string' ? query.sinopsis : '';
   const queryKategori = typeof query.kategori === 'string' ? query.kategori : (querySeri ? 'Novel & Cerbung' : 'Puisi');
+  const queryEvent = typeof query.event === 'string' ? query.event : '';
   const defaultJudul = typeof query.judul === 'string'
     ? query.judul
     : (querySeri && queryBab ? `${querySeri} — Bab ${queryBab}` : '');
@@ -70,6 +71,9 @@ export default async function TulisKaryaPage({
     const judul_bab = String(formData.get('judul_bab') || '').trim() || null;
     const sinopsis = String(formData.get('sinopsis') || '').trim() || null;
 
+    const ikutSayembara = formData.get('ikut_sayembara') === 'yes';
+    const eventTag = ikutSayembara ? 'sayembara-hujan' : null;
+
     const gambar = formData.get('gambar');
     let gambarUrl: string | null = null;
     const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
@@ -91,15 +95,46 @@ export default async function TulisKaryaPage({
 
     try {
       await pool.query(
-        `INSERT INTO karya (judul, kategori, isi_tulisan, nama_pengguna, status_penulis, link_trakteer, gambar_url, user_id, nomor_bab, judul_bab, nama_cerita, sinopsis, status_cerita)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'Ongoing')`,
-        [judul, kategori, isi_tulisan, nama_pengguna, status_penulis, link_trakteer, gambarUrl, currentUser?.uid || 'guest_user', nomor_bab, judul_bab, nama_cerita, sinopsis]
+        `INSERT INTO karya (judul, kategori, isi_tulisan, nama_pengguna, status_penulis, link_trakteer, gambar_url, user_id, nomor_bab, judul_bab, nama_cerita, sinopsis, status_cerita, event_tag)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'Ongoing', $13)`,
+        [judul, kategori, isi_tulisan, nama_pengguna, status_penulis, link_trakteer, gambarUrl, currentUser?.uid || 'guest_user', nomor_bab, judul_bab, nama_cerita, sinopsis, eventTag]
       );
+
+      // Pemberian badge otomatis Peserta Sayembara I
+      if (ikutSayembara && currentUser?.uid) {
+        try {
+          const badgeCheck = await pool.query(
+            `SELECT id FROM badges WHERE kode = 'peserta_sayembara_1' LIMIT 1`
+          );
+          let badgeId = badgeCheck.rows[0]?.id;
+          if (!badgeId) {
+            const insBadge = await pool.query(
+              `INSERT INTO badges (kode, nama, deskripsi, icon, rarity)
+               VALUES ('peserta_sayembara_1', 'Peserta Sayembara I', 'Telah mengirimkan karya resmi pada Sayembara Perintis Fadrodzak.', '✒️', 'rare')
+               ON CONFLICT (kode) DO UPDATE SET nama = EXCLUDED.nama
+               RETURNING id`
+            );
+            badgeId = insBadge.rows[0]?.id;
+          }
+          if (badgeId) {
+            await pool.query(
+              `INSERT INTO user_badges (user_id, badge_id) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
+              [currentUser.uid, badgeId]
+            );
+          }
+        } catch (bErr) {
+          console.warn('[Tulis] Notice pemberian badge peserta:', bErr);
+        }
+      }
     } catch (saveErr) {
       console.error('[Tulis] Gagal simpan karya:', saveErr);
     }
 
     revalidatePath('/');
+    revalidatePath('/event/sayembara-perintis');
+    if (ikutSayembara) {
+      redirect('/event/sayembara-perintis?submitted=true');
+    }
     redirect('/');
   }
 
@@ -236,6 +271,32 @@ export default async function TulisKaryaPage({
                 className="w-full px-3.5 py-2.5 rounded-xl border border-[#EAE2D9] bg-white text-xs text-[#2C2A29] outline-none focus:border-[#C85A32] font-serif italic"
               />
             </div>
+          </div>
+
+          {/* Opsi Keikutsertaan Sayembara Sastra */}
+          <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#FFFDF9] via-[#FAF8F5] to-[#F5EFEB] border border-[#E2D7CC] space-y-2">
+            <label className="flex items-start gap-3 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                name="ikut_sayembara"
+                value="yes"
+                defaultChecked={queryEvent === 'sayembara-perintis'}
+                className="mt-1 w-4 h-4 rounded text-[#C85A32] border-[#D8CEC4] focus:ring-[#C85A32] accent-[#C85A32]"
+              />
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-serif font-bold text-sm text-[#1C1A19]">
+                    Ikutkan Naskah ke Sayembara: &ldquo;Hujan, Rumah, dan Kenangan&rdquo;
+                  </span>
+                  <span className="text-[10px] font-sans font-bold bg-[#C85A32]/10 text-[#C85A32] px-2 py-0.5 rounded-full border border-[#C85A32]/20">
+                    Hadiah Total Rp200.000
+                  </span>
+                </div>
+                <p className="text-xs text-[#5C544F] leading-relaxed">
+                  Karya akan terdaftar resmi di kurasi sayembara dan Anda langsung meraih lencana eksklusif <strong>✒️ Peserta Sayembara I</strong> di profil Anda.
+                </p>
+              </div>
+            </label>
           </div>
 
           <div className="space-y-2">

@@ -140,6 +140,37 @@ export async function POST(request: NextRequest) {
           );
         }
       }
+
+      // d. Pemberian Badge Eksklusif: Perintis Fadrodzak (Founding Member untuk 500 pengguna pertama)
+      try {
+        const countRes = await pool.query('SELECT COUNT(*)::int as count FROM profil_pengguna');
+        const userCount = Number(countRes.rows[0]?.count || 0);
+        if (userCount <= 500) {
+          const perintisCheck = await pool.query(
+            `SELECT id FROM badges WHERE kode = 'perintis_fadrodzak' LIMIT 1`
+          );
+          let perintisBadgeId = perintisCheck.rows[0]?.id;
+          if (!perintisBadgeId) {
+            const insBadge = await pool.query(
+              `INSERT INTO badges (kode, nama, deskripsi, icon, rarity)
+               VALUES ('perintis_fadrodzak', 'Perintis Fadrodzak', '500 Penulis & Pembaca Perintis Generasi Awal Fadrodzak.', '🪶', 'legendary')
+               ON CONFLICT (kode) DO UPDATE SET nama = EXCLUDED.nama
+               RETURNING id`
+            );
+            perintisBadgeId = insBadge.rows[0]?.id;
+          }
+          if (perintisBadgeId) {
+            await pool.query(
+              `INSERT INTO user_badges (user_id, badge_id)
+               VALUES ($1, $2)
+               ON CONFLICT DO NOTHING`,
+              [userUid, perintisBadgeId]
+            );
+          }
+        }
+      } catch (perintisErr) {
+        console.warn('[Session Route] Notice badge perintis:', perintisErr);
+      }
     } catch (dbErr) {
       console.warn('[Session Route] Database provisioning notice:', dbErr);
     }

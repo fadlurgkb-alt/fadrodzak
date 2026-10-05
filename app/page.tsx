@@ -9,7 +9,7 @@ import HeaderProfileButton from '../components/HeaderProfileButton';
 import LastReadWidget from '../components/LastReadWidget';
 import { SearchProvider } from '../components/SearchContext';
 import { revalidatePath } from 'next/cache';
-import { BookOpen, PenLine, Compass, Coffee, UserRound } from 'lucide-react';
+import { BookOpen, PenLine, Compass, Coffee, UserRound, Sparkles, Trophy } from 'lucide-react';
 
 export const revalidate = 30;
 
@@ -71,6 +71,13 @@ export default async function HomePage({ searchParams }: PageProps) {
               {/* Menu Navigasi Desktop (Hanya tampil di Laptop/PC agar layar luas tetap fungsional) */}
               <nav className="hidden md:flex items-center gap-1 text-xs font-medium text-[#5C544F]">
                 <Link
+                  href="/event/sayembara-perintis"
+                  className="px-3 py-1.5 rounded-xl hover:text-[#C85A32] hover:bg-[#FAF8F5] transition flex items-center gap-1.5 text-[#C85A32] font-semibold"
+                >
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>Sayembara (Rp200k)</span>
+                </Link>
+                <Link
                   href="/belajar"
                   className="px-3 py-1.5 rounded-xl hover:text-[#C85A32] hover:bg-[#FAF8F5] transition flex items-center gap-1.5"
                 >
@@ -95,6 +102,32 @@ export default async function HomePage({ searchParams }: PageProps) {
 
           {/* 1. Hero Banner Berkarakter Editorial */}
           <HeroBanner />
+
+          {/* 1.5 Spotlight Sayembara Fadrodzak */}
+          <div className="mb-5 rounded-2xl bg-gradient-to-r from-[#FFFDF9] via-[#FAF8F5] to-[#F5EFEB] border border-[#E2D7CC] p-4 sm:p-5 shadow-2xs relative overflow-hidden">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#C85A32]/10 text-[#C85A32] text-[10px] font-serif font-bold uppercase tracking-wider">
+                  <Sparkles className="w-3 h-3" />
+                  <span>✦ Sayembara Perintis Fadrodzak ✦</span>
+                </div>
+                <h2 className="font-serif text-base sm:text-xl font-bold text-[#1C1A19]">
+                  Tema: &ldquo;Hujan, Rumah, dan Kenangan&rdquo;
+                </h2>
+                <p className="text-xs text-[#5C544F]">
+                  Total hadiah <strong>Rp200.000</strong> untuk Penulis, Pembaca Pilihan, &amp; Sahabat Aksara. Gratis &amp; terbuka untuk umum.
+                </p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <Link
+                  href="/event/sayembara-perintis"
+                  className="w-full sm:w-auto text-center px-4 py-2 bg-[#C85A32] hover:bg-[#A94728] text-white rounded-xl text-xs font-semibold shadow-2xs transition cursor-pointer"
+                >
+                  Lihat Ketentuan &amp; Ikut &rarr;
+                </Link>
+              </div>
+            </div>
+          </div>
 
           {/* 2. Banner Pasang Aplikasi Tipis */}
           <div className="mb-4 sm:mb-6">
