@@ -232,6 +232,15 @@ const DDL_STATEMENTS: string[] = [
     PRIMARY KEY (blocker_user_id, blocked_user_id)
   )`,
   `ALTER TABLE karya ADD COLUMN IF NOT EXISTS event_tag TEXT`,
+  `CREATE TABLE IF NOT EXISTS referrals (
+    id SERIAL PRIMARY KEY,
+    referrer_id TEXT NOT NULL,
+    referred_id TEXT NOT NULL,
+    status VARCHAR(30) DEFAULT 'registered',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    verified_at TIMESTAMP,
+    UNIQUE(referred_id)
+  )`,
   `INSERT INTO badges (kode, nama, deskripsi, icon, rarity) VALUES
     ('pena_mula', 'Pena Mula', 'Menerbitkan karya sastra pertama Anda.', '🪶', 'common'),
     ('pengrajin_kata', 'Pengrajin Kata', 'Telah menghasilkan 5 karya sastra.', '📜', 'uncommon'),

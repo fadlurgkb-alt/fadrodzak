@@ -486,6 +486,15 @@ const initialStreaks: Map<string, UserStreakItem> = new Map([
   ],
 ]);
 
+export interface ReferralRecordItem {
+  id: number;
+  referrer_id: string;
+  referred_id: string;
+  status: string;
+  created_at: Date;
+  verified_at: Date | null;
+}
+
 interface MemoryStoreData {
   karyas: KaryaItem[];
   tutorials: TutorialItem[];
@@ -506,6 +515,7 @@ interface MemoryStoreData {
   conversationMembers: ChatConversationMemberItem[];
   messages: ChatMessageItem[];
   userBlocks: ChatUserBlockItem[];
+  referrals: ReferralRecordItem[];
   nextId: number;
 }
 
@@ -555,6 +565,7 @@ const memoryStore: MemoryStoreData = (globalWithStore.__FADRODZAK_STORE__ = glob
   conversationMembers: [] as { conversation_id: number; user_id: string; last_read_at: Date; joined_at: Date }[],
   messages: [] as { id: number; conversation_id: number; sender_user_id: string; isi: string; created_at: Date; edited_at: Date | null; deleted_at: Date | null }[],
   userBlocks: [] as { blocker_user_id: string; blocked_user_id: string; created_at: Date }[],
+  referrals: [] as ReferralRecordItem[],
   nextId: 100,
 });
 
@@ -789,6 +800,9 @@ async function runMemoryQuery(text: string, params: any[] = []): Promise<{ rows:
           list = list.filter((k) => k.kategori.toLowerCase() === lowerKat);
         }
       }
+    }
+    if (upper.includes('EVENT_TAG') || upper.includes('SAYEMBARA')) {
+      list = list.filter((k) => k.event_tag === 'sayembara-hujan' || (k.judul && k.judul.toLowerCase().includes('[sayembara]')));
     }
     const mapped = list.map((k) => {
       const total_likes = Math.max(k.jumlah_suka || 0, memoryStore.likes.filter((l: LikeItem) => l.karya_id === k.id).length);
@@ -1485,6 +1499,44 @@ async function runMemoryQuery(text: string, params: any[] = []): Promise<{ rows:
       (b: ChatUserBlockItem) => !(b.blocker_user_id === String(u1) && b.blocked_user_id === String(u2))
     );
     return { rows: [], rowCount: 1 };
+  }
+
+  if (upper.includes('FROM REFERRALS')) {
+    if (upper.includes('REFERRER_ID = $1')) {
+      const refId = String(params[0]);
+      const list = memoryStore.referrals.filter((r: ReferralRecordItem) => r.referrer_id === refId);
+      return { rows: list, rowCount: list.length };
+    }
+    return { rows: memoryStore.referrals, rowCount: memoryStore.referrals.length };
+  }
+
+  if (upper.startsWith('INSERT INTO REFERRALS')) {
+    const [referrer_id, referred_id, status] = params;
+    const existing = memoryStore.referrals.find((r: ReferralRecordItem) => r.referred_id === String(referred_id));
+    if (!existing) {
+      const item: ReferralRecordItem = {
+        id: ++memoryStore.nextId,
+        referrer_id: String(referrer_id),
+        referred_id: String(referred_id),
+        status: String(status || 'registered'),
+        created_at: new Date(),
+        verified_at: null,
+      };
+      memoryStore.referrals.push(item);
+      return { rows: [item], rowCount: 1 };
+    }
+    return { rows: [existing], rowCount: 0 };
+  }
+
+  if (upper.startsWith('UPDATE REFERRALS')) {
+    const referred_id = String(params[0]);
+    const found = memoryStore.referrals.find((r: ReferralRecordItem) => r.referred_id === referred_id);
+    if (found) {
+      found.status = 'published_karya';
+      found.verified_at = new Date();
+      return { rows: [found], rowCount: 1 };
+    }
+    return { rows: [], rowCount: 0 };
   }
 
   return { rows: [], rowCount: 0 };

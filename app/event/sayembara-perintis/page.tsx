@@ -65,8 +65,7 @@ export default async function SayembaraPerintisPage({
               created_at
        FROM karya
        WHERE event_tag = 'sayembara-hujan' 
-          OR judul ILIKE '%[Sayembara]%' 
-          OR judul ILIKE '%Hujan, Rumah%'
+          OR judul ILIKE '%[Sayembara]%'
        ORDER BY created_at DESC
        LIMIT 50`
     );

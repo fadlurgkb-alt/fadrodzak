@@ -107,12 +107,13 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // b. Gamifikasi Pengguna (XP default 0, role default 'user', account_status 'active')
+      // b. Gamifikasi Pengguna (role 'admin' otomatis untuk fadlur.gkb@gmail.com)
+      const userRole = userEmail === 'fadlur.gkb@gmail.com' ? 'admin' : 'user';
       await pool.query(
         `INSERT INTO user_gamification (user_id, xp, role, is_donatur, reputasi, account_status)
-         VALUES ($1, 0, 'user', false, 0, 'active')
-         ON CONFLICT (user_id) DO NOTHING`,
-        [userUid]
+         VALUES ($1, 0, $2, false, 0, 'active')
+         ON CONFLICT (user_id) DO UPDATE SET role = CASE WHEN $2 = 'admin' THEN 'admin' ELSE user_gamification.role END`,
+        [userUid, userRole]
       );
 
       // c. Pemberian Badge Beta Tester jika BETA_TESTER_BADGE_ENABLED=true
@@ -170,6 +171,22 @@ export async function POST(request: NextRequest) {
         }
       } catch (perintisErr) {
         console.warn('[Session Route] Notice badge perintis:', perintisErr);
+      }
+
+      // e. Catat referral jika pengguna mendaftar melalui tautan rujukan teman
+      const cookieStoreRef = await cookies();
+      const refCode = cookieStoreRef.get('fadrodzak_ref')?.value;
+      if (refCode && refCode !== userUid) {
+        try {
+          await pool.query(
+            `INSERT INTO referrals (referrer_id, referred_id, status)
+             VALUES ($1, $2, 'registered')
+             ON CONFLICT (referred_id) DO NOTHING`,
+            [refCode, userUid]
+          );
+        } catch (refErr) {
+          console.warn('[Session Route] Notice referral insert:', refErr);
+        }
       }
     } catch (dbErr) {
       console.warn('[Session Route] Database provisioning notice:', dbErr);

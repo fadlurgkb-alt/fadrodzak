@@ -126,6 +126,18 @@ export default async function TulisKaryaPage({
           console.warn('[Tulis] Notice pemberian badge peserta:', bErr);
         }
       }
+
+      // Verifikasi referral otomatis jika penulis ini diajak oleh seorang kawan
+      if (currentUser?.uid) {
+        try {
+          await pool.query(
+            `UPDATE referrals SET status = 'published_karya', verified_at = CURRENT_TIMESTAMP WHERE referred_id = $1`,
+            [currentUser.uid]
+          );
+        } catch (refUpErr) {
+          console.warn('[Tulis] Notice update referral status:', refUpErr);
+        }
+      }
     } catch (saveErr) {
       console.error('[Tulis] Gagal simpan karya:', saveErr);
     }

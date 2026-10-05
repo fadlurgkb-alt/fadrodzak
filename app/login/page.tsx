@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   signInWithPopup,
@@ -21,6 +21,20 @@ export default function LoginPage() {
   const [nama, setNama] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const ref = params.get('ref');
+        if (ref) {
+          document.cookie = `fadrodzak_ref=${encodeURIComponent(ref)}; path=/; max-age=${60 * 60 * 24 * 30}`;
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   /**
    * Mengirim ID token Firebase ke server Next.js untuk membuat session cookie
