@@ -1,18 +1,19 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Gift, Share2, Check, Copy, MessageCircle, Users } from 'lucide-react';
+import { Gift, Check, Copy, MessageCircle, Users } from 'lucide-react';
 
 interface Props {
   userId: string;
-  nama: string;
+  nama?: string;
 }
 
 export default function ReferralShareCard({ userId, nama }: Props) {
   const [copied, setCopied] = useState(false);
 
+  const pengundang = nama ? `Saya (${nama})` : 'Saya';
   const referralUrl = `https://fadrodzak.my.id/login?ref=${encodeURIComponent(userId)}`;
-  const shareMessage = `Hai kawan! Saya mengundangmu bergabung dan berkarya di Fadrodzak — ruang sastra tenang untuk menerbitkan puisi, cerpen, dan cerita bersambung.\n\nSedang berlangsung Sayembara Sastra berhadiah total Rp200.000!\n\nDaftar lewat tautan ini: ${referralUrl}`;
+  const shareMessage = `Hai kawan! ${pengundang} mengundangmu bergabung dan berkarya di Fadrodzak — ruang sastra tenang untuk menerbitkan puisi, cerpen, dan cerita bersambung.\n\nSedang berlangsung Sayembara Sastra berhadiah total Rp200.000!\n\nDaftar lewat tautan ini: ${referralUrl}`;
 
   const handleCopy = async () => {
     try {

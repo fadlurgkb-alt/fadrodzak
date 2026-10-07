@@ -98,9 +98,13 @@ export default async function AdminSayembaraPage() {
   let komentarList: KomentarItem[] = [];
   try {
     const { rows } = await pool.query(
-      `SELECT c.id, c.karya_id, c.nama_pengguna, c.isi_komentar, c.created_at, k.judul as judul_karya
+      `SELECT c.id, c.karya_id, c.nama_pengguna, c.isi_komentar, c.created_at, 
+              k.judul as judul_karya,
+              p.user_id as commenter_user_id,
+              p.email as commenter_email
        FROM komentar c
        LEFT JOIN karya k ON k.id = c.karya_id
+       LEFT JOIN profil_pengguna p ON p.nama = c.nama_pengguna
        ORDER BY c.created_at DESC
        LIMIT 200`
     );
@@ -113,6 +117,8 @@ export default async function AdminSayembaraPage() {
   const pembacaStats: {
     [nama: string]: {
       nama: string;
+      userId: string;
+      email?: string;
       totalKomentar: number;
       contohKomentar: string[];
       terakhirAktif: string | Date;
@@ -120,11 +126,14 @@ export default async function AdminSayembaraPage() {
     };
   } = {};
 
-  komentarList.forEach((c) => {
+  komentarList.forEach((c: any) => {
     const nama = c.nama_pengguna || 'Anonim';
+    const userId = c.commenter_user_id || nama;
     if (!pembacaStats[nama]) {
       pembacaStats[nama] = {
         nama,
+        userId,
+        email: c.commenter_email,
         totalKomentar: 0,
         contohKomentar: [],
         terakhirAktif: c.created_at,
@@ -172,12 +181,19 @@ export default async function AdminSayembaraPage() {
     if (!targetUserId || !badgeKode) return;
 
     try {
+      // Cari real user_id jika yang dikirim adalah nama pengguna
+      const uRes = await pool.query(
+        'SELECT user_id FROM profil_pengguna WHERE user_id = $1 OR nama = $1 LIMIT 1',
+        [targetUserId]
+      );
+      const realUid = uRes.rows[0]?.user_id || targetUserId;
+
       const bRes = await pool.query('SELECT id FROM badges WHERE kode = $1 LIMIT 1', [badgeKode]);
       const badgeId = bRes.rows[0]?.id;
-      if (badgeId) {
+      if (badgeId && realUid) {
         await pool.query(
           'INSERT INTO user_badges (user_id, badge_id) VALUES ($1, $2) ON CONFLICT DO NOTHING',
-          [targetUserId, badgeId]
+          [realUid, badgeId]
         );
       }
     } catch (err) {
