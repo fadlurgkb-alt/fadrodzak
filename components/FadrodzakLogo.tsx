@@ -160,11 +160,11 @@ export default function FadrodzakLogo({
     <div className="flex flex-col leading-tight select-none">
       <div className="flex items-baseline gap-1.5">
         <span
-          className={`font-serif font-black tracking-tight bg-gradient-to-r from-[#C85A32] via-[#B84E27] to-[#8C3214] bg-clip-text text-transparent transition-all duration-300 group-hover:tracking-normal ${
+          className={`font-serif font-bold tracking-tight text-[#C85A32] transition-all duration-300 group-hover:tracking-normal ${
             size === 'sm'
               ? 'text-lg'
               : size === 'md'
-              ? 'text-2xl'
+              ? 'text-2xl sm:text-3xl'
               : size === 'lg'
               ? 'text-3xl'
               : 'text-4xl'
@@ -179,7 +179,7 @@ export default function FadrodzakLogo({
       </div>
       {(variant === 'compact' || variant === 'full') && (
         <span
-          className={`font-serif tracking-widest uppercase text-[#736B63] font-semibold transition-colors duration-300 group-hover:text-[#5C544F] ${
+          className={`hidden sm:inline-block font-serif tracking-widest uppercase text-[#736B63] font-semibold transition-colors duration-300 group-hover:text-[#5C544F] ${
             size === 'sm'
               ? 'text-[9px]'
               : size === 'md'

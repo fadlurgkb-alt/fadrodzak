@@ -66,8 +66,7 @@ export default async function HomePage({ searchParams }: PageProps) {
           {/* Header Baris Atas: Logo, Search Bar, & Tombol Navigasi Desktop */}
           <div className="flex items-center justify-between gap-4 mb-6 pb-4 border-b border-[#EAE2D9]">
             <div className="flex items-center gap-6">
-              <FadrodzakLogo size="md" variant="icon" showLink className="sm:hidden" />
-              <FadrodzakLogo size="md" variant="compact" showLink className="hidden sm:flex" />
+              <FadrodzakLogo size="md" variant="compact" showLink />
               {/* Menu Navigasi Desktop (Hanya tampil di Laptop/PC agar layar luas tetap fungsional) */}
               <nav className="hidden md:flex items-center gap-1 text-xs font-medium text-[#5C544F]">
                 <Link
