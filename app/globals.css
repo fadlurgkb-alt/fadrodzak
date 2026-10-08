@@ -1,4 +1,4 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
 @theme {
@@ -24,3 +24,58 @@ body {
 h1, h2, h3, h4, .font-serif {
   font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
 }
+
+/* === LITERARY MOTION DESIGN: FADRODZAK EMBLEM & SIGNATURE === */
+@keyframes fadrodzakOrbitSlow {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadrodzakNibBreathe {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-1.2px) scale(1.02);
+  }
+}
+
+@keyframes fadrodzakStarPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.22);
+    opacity: 1;
+  }
+}
+
+@keyframes fadrodzakInkSheen {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-orbit-slow {
+  transform-origin: 50px 50px;
+  animation: fadrodzakOrbitSlow 32s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animate-nib-breathe {
+  transform-origin: 50px 50px;
+  animation: fadrodzakNibBreathe 4.5s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+}
+
+.animate-star-pulse {
+  transform-origin: 50px 12px;
+  animation: fadrodzakStarPulse 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+

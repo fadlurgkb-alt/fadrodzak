@@ -10,6 +10,7 @@ import LastReadWidget from '../components/LastReadWidget';
 import { SearchProvider } from '../components/SearchContext';
 import { revalidatePath } from 'next/cache';
 import { BookOpen, PenLine, Compass, Coffee, UserRound, Sparkles, Trophy } from 'lucide-react';
+import FadrodzakLogo from '../components/FadrodzakLogo';
 
 export const revalidate = 30;
 
@@ -65,9 +66,8 @@ export default async function HomePage({ searchParams }: PageProps) {
           {/* Header Baris Atas: Logo, Search Bar, & Tombol Navigasi Desktop */}
           <div className="flex items-center justify-between gap-4 mb-6 pb-4 border-b border-[#EAE2D9]">
             <div className="flex items-center gap-6">
-              <Link href="/" className="font-serif text-2xl sm:text-3xl font-bold text-[#1C1A19] tracking-tight">
-                Fadrodzak
-              </Link>
+              <FadrodzakLogo size="md" variant="icon" showLink className="sm:hidden" />
+              <FadrodzakLogo size="md" variant="compact" showLink className="hidden sm:flex" />
               {/* Menu Navigasi Desktop (Hanya tampil di Laptop/PC agar layar luas tetap fungsional) */}
               <nav className="hidden md:flex items-center gap-1 text-xs font-medium text-[#5C544F]">
                 <Link
