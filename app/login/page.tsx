@@ -194,16 +194,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5EFEB] flex flex-col items-center justify-center p-4 font-sans text-[#2B2B2B] relative overflow-hidden selection:bg-[#C85A32]/20 selection:text-[#1F1916]">
-      {/* 1. FILTER SVG GOOEY (Efek Cairan / Tetesan Tinta Sastra) */}
+    <div className="min-h-screen bg-[#F8F5EE] flex flex-col items-center justify-center p-4 font-sans text-[#2B2B2B] relative overflow-hidden selection:bg-[#C85A32]/20 selection:text-[#3A1F16]">
+      {/* 1. FILTER SVG GOOEY (Tetesan Tinta Terracotta Sastra Fadrodzak) */}
       <svg className="absolute w-0 h-0 pointer-events-none" aria-hidden="true">
         <defs>
           <filter id="ink-goo">
-            <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+            <feGaussianBlur in="SourceGraphic" stdDeviation="11" result="blur" />
             <feColorMatrix
               in="blur"
               mode="matrix"
-              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9"
+              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 24 -9"
               result="goo"
             />
             <feBlend in="SourceGraphic" in2="goo" />
@@ -211,77 +211,67 @@ export default function LoginPage() {
         </defs>
       </svg>
 
-      {/* Ornamen Latar Belakang Klasik Sastra */}
-      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(#C85A32_0.75px,transparent_0.75px)] [background-size:24px_24px] opacity-15" />
-
-      {/* Brand Header & Logo Luar */}
-      <motion.div 
-        initial={{ opacity: 0, y: -16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="text-center mb-6 flex flex-col items-center z-10"
-      >
-        <FadrodzakLogo size="lg" variant="compact" showLink={true} className="justify-center mb-2" />
-        <p className="text-xs font-serif italic text-[#736B63] tracking-wide">
-          &ldquo;Tempat di mana kata-kata menemukan rumahnya&rdquo;
-        </p>
-      </motion.div>
+      {/* Ornamen Latar Belakang Kertas Sastra Hangat */}
+      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(#C85A32_0.8px,transparent_0.8px)] [background-size:24px_24px] opacity-15" />
+      <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#EFE4D6]/60 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-[#EAD8C7]/50 blur-3xl pointer-events-none" />
 
       {/* 2. AREA EFEK CAIRAN GOOEY & KOTAK AKSARA */}
-      <div className="relative flex flex-col items-center justify-center w-full max-w-lg min-h-[500px]">
-        {/* Lapisan Efek Gooey Filter (Di belakang isi interaktif agar teks/input tetap tajam & jernih) */}
+      <div className="relative flex flex-col items-center justify-center w-full max-w-lg min-h-[580px] my-auto">
+        {/* Lapisan Animasi Efek Gooey Filter (Blob Cairan Morfologi di Belakang) */}
         <div 
           style={{ filter: 'url(#ink-goo)' }} 
           className="absolute inset-0 flex items-center justify-center pointer-events-none z-0"
         >
-          {/* Tetesan Tinta Kecil yang Mengalir/Melayang */}
+          {/* Tetesan Tinta Terracotta yang Melayang Halus Saat Tertutup */}
           <motion.div
             animate={{
-              y: isOpen ? -200 : -55,
-              opacity: isOpen ? 0 : [0.7, 1, 0.7],
-              scale: isOpen ? 0.3 : [1, 1.15, 1],
+              y: isOpen ? -240 : -64,
+              opacity: isOpen ? 0 : [0.75, 1, 0.75],
+              scale: isOpen ? 0.2 : [1, 1.12, 1],
             }}
             transition={{
               duration: isOpen ? 0.4 : 3,
               repeat: isOpen ? 0 : Infinity,
               ease: 'easeInOut',
             }}
-            className="absolute w-11 h-11 bg-[#1F1916] rounded-full shadow-md"
+            className="absolute w-12 h-12 bg-gradient-to-br from-[#C85A32] to-[#A94824] rounded-full shadow-md"
           />
 
-          {/* Tetesan Sekunder (Aksen Terracotta Halus) */}
+          {/* Tetesan Sekunder (Aksen Emas Sastra) */}
           <motion.div
             animate={{
-              y: isOpen ? -180 : -42,
-              x: isOpen ? 0 : 26,
-              opacity: isOpen ? 0 : 0.6,
-              scale: isOpen ? 0.2 : 0.8,
+              y: isOpen ? -220 : -48,
+              x: isOpen ? 0 : 30,
+              opacity: isOpen ? 0 : 0.65,
+              scale: isOpen ? 0.2 : 0.85,
             }}
             transition={{
               duration: 0.5,
               ease: 'backOut',
             }}
-            className="absolute w-7 h-7 bg-[#C85A32] rounded-full"
+            className="absolute w-7 h-7 bg-[#E8A87C] rounded-full"
           />
 
-          {/* Blob Kontainer Utama yang Mengembang (Gooey Shape) */}
+          {/* Wadah Utama yang Melar (Morphing dari Tombol Terracotta ke Kartu Sastra Krem) */}
           <motion.div
             animate={{
-              width: isOpen ? (isRegister ? 440 : 420) : 210,
-              height: isOpen ? (isRegister ? 600 : 540) : 56,
-              borderRadius: isOpen ? 28 : 28,
+              width: isOpen ? (isRegister ? 450 : 430) : 230,
+              height: isOpen ? (isRegister ? 680 : 620) : 58,
+              borderRadius: isOpen ? 26 : 29,
+              backgroundColor: isOpen ? '#FAF8F5' : '#C85A32',
             }}
             transition={{
-              duration: 0.7,
+              duration: 0.75,
               type: 'spring',
-              stiffness: 140,
+              stiffness: 130,
               damping: 18,
             }}
-            className="bg-[#1F1916] shadow-2xl relative"
+            className="shadow-2xl border border-[#E8DEC0]/80 relative"
           />
         </div>
 
-        {/* 3. KONTEN INTERAKTIF (Di lapisan z-10 di atas filter agar tajam, nyaman diketik & diakses) */}
+        {/* 3. KONTEN INTERAKTIF (Di Lapisan Atas z-10 Agar Teks & Input Tajam, Jelas, & Kontras) */}
         <div className="relative z-10 w-full flex items-center justify-center p-3">
           <AnimatePresence mode="wait">
             {!isOpen ? (
@@ -289,38 +279,30 @@ export default function LoginPage() {
               <motion.button
                 key="trigger-button"
                 onClick={() => setIsOpen(true)}
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.92 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
+                exit={{ opacity: 0, scale: 0.85 }}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                className="w-[210px] h-[56px] rounded-full flex items-center justify-center gap-2.5 text-[#F5EFEB] font-serif tracking-wider text-base cursor-pointer shadow-lg hover:text-white transition-colors"
+                className="w-[230px] h-[58px] rounded-full flex items-center justify-center gap-2.5 text-white font-serif tracking-wide text-base cursor-pointer shadow-lg hover:brightness-105 transition-all"
                 title="Buka Ruang Aksara"
               >
-                <span className="w-2 h-2 rounded-full bg-[#C85A32] animate-pulse" />
-                <span>Masuk Aksara</span>
-                <span className="text-xs text-[#E8DEC0]/60 font-sans tracking-normal">→</span>
+                <span className="w-2.5 h-2.5 rounded-full bg-[#FAF8F5] animate-pulse" />
+                <span className="font-medium">Masuk ke Ruang Aksara</span>
+                <span className="text-xs font-sans opacity-80">→</span>
               </motion.button>
             ) : (
-              /* State Kontainer Terbuka: Form Lengkap Ruang Aksara */
+              /* State Kontainer Terbuka: Form Lengkap dengan Logo & Slogan di Dalam */
               <motion.div
                 key="open-card"
-                initial={{ opacity: 0, y: 15 }}
+                initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 15 }}
-                transition={{ duration: 0.45, delay: 0.15 }}
-                className="w-full max-w-[430px] p-6 sm:p-8 text-[#F5EFEB] flex flex-col justify-between"
+                exit={{ opacity: 0, y: 18 }}
+                transition={{ duration: 0.45, delay: 0.18 }}
+                className="w-full max-w-[440px] p-6 sm:p-7 text-[#2B2B2B] flex flex-col justify-between"
               >
-                {/* Header Kotak */}
-                <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
-                  <div>
-                    <h2 className="text-xl font-serif text-[#FAF8F5] tracking-wide">
-                      {isRegister ? 'Pendaftaran Penulis' : 'Masuk ke Ruang Aksara'}
-                    </h2>
-                    <p className="text-[11px] text-[#A5958A] mt-0.5">
-                      {isRegister ? 'Torehkan bait dan cerita pertamamu' : 'Lanjutkan lembar karya dan renunganmu'}
-                    </p>
-                  </div>
+                {/* Header Kartu: Logo Fadrodzak & Slogan Menyatu di Dalam Wadah */}
+                <div className="relative text-center pb-4 mb-4 border-b border-[#E8DEC0]/80">
                   {/* Tombol Tutup / Susutkan */}
                   <button
                     type="button"
@@ -329,12 +311,22 @@ export default function LoginPage() {
                       setErrorMsg('');
                     }}
                     aria-label="Tutup formulir"
-                    className="p-1.5 rounded-full text-[#A5958A] hover:text-white hover:bg-white/10 transition cursor-pointer"
+                    className="absolute top-0 right-0 p-1.5 rounded-full text-[#7A6B63] hover:text-[#C85A32] hover:bg-[#F3ECE0] transition cursor-pointer"
                   >
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
+
+                  <div className="flex flex-col items-center">
+                    <FadrodzakLogo size="md" variant="compact" showLink={true} className="justify-center mb-1.5" />
+                    <p className="text-xs font-serif italic text-[#4A3E39] font-medium tracking-wide">
+                      &ldquo;Tempat di mana kata-kata menemukan rumahnya&rdquo;
+                    </p>
+                    <div className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#F3ECE0] text-[#8C3B1A] text-[11px] font-serif font-medium">
+                      <span>{isRegister ? 'Pendaftaran Penulis Baru' : 'Ruang Masuk Penulis'}</span>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Pesan Kesalahan */}
@@ -342,19 +334,19 @@ export default function LoginPage() {
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
-                    className="mb-4 p-3 bg-red-950/70 text-red-200 text-xs rounded-xl border border-red-800/60 flex items-start gap-2"
+                    className="mb-4 p-3 bg-red-50 text-red-700 text-xs rounded-xl border border-red-200 flex items-start gap-2"
                   >
-                    <span className="shrink-0 text-red-400">⚠️</span>
+                    <span className="shrink-0 text-red-500">⚠️</span>
                     <span className="leading-relaxed">{errorMsg}</span>
                   </motion.div>
                 )}
 
-                {/* Tombol Google Auth */}
+                {/* Tombol Login Google */}
                 <button
                   onClick={handleGoogleLogin}
                   disabled={loading}
                   type="button"
-                  className="w-full flex items-center justify-center gap-3 py-2.5 px-4 bg-white text-[#1F1916] rounded-xl hover:bg-[#FAF8F5] transition text-sm font-medium shadow-sm disabled:opacity-50 cursor-pointer active:scale-[0.99]"
+                  className="w-full flex items-center justify-center gap-3 py-2.5 px-4 bg-white border border-[#E0D8CC] text-[#2B2B2B] rounded-xl hover:bg-[#FAF8F5] hover:border-[#C85A32]/40 transition text-sm font-medium shadow-2xs disabled:opacity-50 cursor-pointer active:scale-[0.99]"
                 >
                   <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                     <path
@@ -378,20 +370,20 @@ export default function LoginPage() {
                 </button>
 
                 {/* Pemisah Garis Sastra */}
-                <div className="relative my-4">
+                <div className="relative my-3.5">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-white/10" />
+                    <div className="w-full border-t border-[#E8DEC0]" />
                   </div>
                   <div className="relative flex justify-center text-[10px] uppercase tracking-widest">
-                    <span className="bg-[#1F1916] px-3 text-[#A5958A] font-serif">atau lewat email</span>
+                    <span className="bg-[#FAF8F5] px-3 text-[#8C7A70] font-serif">atau via email</span>
                   </div>
                 </div>
 
                 {/* Form Email / Sandi */}
-                <form onSubmit={handleSubmitEmail} className="space-y-3.5">
+                <form onSubmit={handleSubmitEmail} className="space-y-3">
                   {isRegister && (
                     <div>
-                      <label className="block text-[11px] font-semibold text-[#A5958A] uppercase tracking-wider mb-1 font-serif">
+                      <label className="block text-[11px] font-semibold text-[#4A3E39] uppercase tracking-wider mb-1 font-serif">
                         Nama Pena
                       </label>
                       <input
@@ -399,14 +391,14 @@ export default function LoginPage() {
                         required
                         value={nama}
                         onChange={(e) => setNama(e.target.value)}
-                        className="w-full px-3.5 py-2 rounded-xl bg-stone-800/90 border border-stone-700 text-[#F5EFEB] placeholder-stone-500 text-sm outline-none focus:border-[#C85A32] focus:ring-1 focus:ring-[#C85A32] transition"
+                        className="w-full px-3.5 py-2 rounded-xl bg-white border border-[#E0D8CC] text-[#2B2B2B] placeholder-[#A5958A] text-sm outline-none focus:border-[#C85A32] focus:ring-1 focus:ring-[#C85A32] transition"
                         placeholder="misal: Amir Hamzah"
                       />
                     </div>
                   )}
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#A5958A] uppercase tracking-wider mb-1 font-serif">
+                    <label className="block text-[11px] font-semibold text-[#4A3E39] uppercase tracking-wider mb-1 font-serif">
                       Alamat Email
                     </label>
                     <input
@@ -414,13 +406,13 @@ export default function LoginPage() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full px-3.5 py-2 rounded-xl bg-stone-800/90 border border-stone-700 text-[#F5EFEB] placeholder-stone-500 text-sm outline-none focus:border-[#C85A32] focus:ring-1 focus:ring-[#C85A32] transition"
+                      className="w-full px-3.5 py-2 rounded-xl bg-white border border-[#E0D8CC] text-[#2B2B2B] placeholder-[#A5958A] text-sm outline-none focus:border-[#C85A32] focus:ring-1 focus:ring-[#C85A32] transition"
                       placeholder="penulis@aksara.id"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#A5958A] uppercase tracking-wider mb-1 font-serif">
+                    <label className="block text-[11px] font-semibold text-[#4A3E39] uppercase tracking-wider mb-1 font-serif">
                       Kata Sandi
                     </label>
                     <input
@@ -428,7 +420,7 @@ export default function LoginPage() {
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full px-3.5 py-2 rounded-xl bg-stone-800/90 border border-stone-700 text-[#F5EFEB] placeholder-stone-500 text-sm outline-none focus:border-[#C85A32] focus:ring-1 focus:ring-[#C85A32] transition"
+                      className="w-full px-3.5 py-2 rounded-xl bg-white border border-[#E0D8CC] text-[#2B2B2B] placeholder-[#A5958A] text-sm outline-none focus:border-[#C85A32] focus:ring-1 focus:ring-[#C85A32] transition"
                       placeholder="Minimal 6 karakter"
                     />
                   </div>
@@ -436,14 +428,14 @@ export default function LoginPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full mt-2 py-2.5 px-4 bg-[#C85A32] hover:bg-[#A94824] text-white rounded-xl font-medium transition text-sm shadow-md disabled:opacity-50 font-serif cursor-pointer active:scale-[0.99]"
+                    className="w-full mt-1.5 py-2.5 px-4 bg-[#C85A32] hover:bg-[#A94824] text-white rounded-xl font-medium transition text-sm shadow-sm disabled:opacity-50 font-serif cursor-pointer active:scale-[0.99]"
                   >
-                    {loading ? 'Memproses...' : isRegister ? 'Daftarkan Akun' : 'Masuk ke Ruang Aksara'}
+                    {loading ? 'Memproses...' : isRegister ? 'Daftarkan Akun Penulis' : 'Masuk ke Ruang Sastra'}
                   </button>
                 </form>
 
                 {/* Sakelar Masuk / Daftar */}
-                <div className="mt-4 pt-3 border-t border-white/10 text-center text-xs text-[#A5958A]">
+                <div className="mt-3.5 pt-3 border-t border-[#E8DEC0]/80 text-center text-xs text-[#736B63]">
                   {isRegister ? (
                     <p>
                       Sudah punya akun pena?{' '}
@@ -453,7 +445,7 @@ export default function LoginPage() {
                           setIsRegister(false);
                           setErrorMsg('');
                         }}
-                        className="text-[#E07A5F] hover:text-[#C85A32] font-semibold underline underline-offset-2 cursor-pointer transition"
+                        className="text-[#C85A32] font-semibold hover:underline cursor-pointer transition"
                       >
                         Masuk di sini
                       </button>
@@ -467,7 +459,7 @@ export default function LoginPage() {
                           setIsRegister(true);
                           setErrorMsg('');
                         }}
-                        className="text-[#E07A5F] hover:text-[#C85A32] font-semibold underline underline-offset-2 cursor-pointer transition"
+                        className="text-[#C85A32] font-semibold hover:underline cursor-pointer transition"
                       >
                         Buat akun sekarang
                       </button>
@@ -485,11 +477,11 @@ export default function LoginPage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
-        className="mt-6 z-10 text-center"
+        className="mt-4 z-10 text-center"
       >
         <Link 
           href="/" 
-          className="text-xs text-[#736B63] hover:text-[#1F1916] transition font-serif tracking-wide underline underline-offset-4 decoration-[#736B63]/40"
+          className="text-xs text-[#736B63] hover:text-[#C85A32] transition font-serif tracking-wide underline underline-offset-4 decoration-[#736B63]/40"
         >
           &larr; Kembali ke Beranda Fadrodzak
         </Link>
