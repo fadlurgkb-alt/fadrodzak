@@ -21,7 +21,6 @@ import {
   BookOpen,
   ChevronLeft,
   ChevronRight,
-  List,
   Bookmark,
   BookmarkCheck,
 } from 'lucide-react';
@@ -256,14 +255,6 @@ export default function ReadingExperience({
     : isNote
     ? 'text-[#2B5885]'
     : 'text-[#C85A32]';
-
-  const accentBadgeBgClass = isDark
-    ? 'bg-[#E27E5A]/20 text-[#E27E5A]'
-    : isCoffee
-    ? 'bg-[#A2481A]/15 text-[#A2481A]'
-    : isNote
-    ? 'bg-[#2B5885]/15 text-[#2B5885]'
-    : 'bg-[#C85A32]/10 text-[#C85A32]';
 
   const titleTextClass = isDark
     ? 'text-[#F9F6F0]'

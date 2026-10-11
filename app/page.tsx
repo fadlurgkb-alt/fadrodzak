@@ -9,7 +9,7 @@ import HeaderProfileButton from '../components/HeaderProfileButton';
 import LastReadWidget from '../components/LastReadWidget';
 import { SearchProvider } from '../components/SearchContext';
 import { revalidatePath } from 'next/cache';
-import { BookOpen, PenLine, Compass, Coffee, UserRound, Sparkles, Trophy } from 'lucide-react';
+import { BookOpen, PenLine, Compass, Coffee, Sparkles } from 'lucide-react';
 import FadrodzakLogo from '../components/FadrodzakLogo';
 
 export const revalidate = 30;

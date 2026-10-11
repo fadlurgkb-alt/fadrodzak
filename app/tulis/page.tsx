@@ -24,7 +24,7 @@ export default async function TulisKaryaPage({
     : (querySeri && queryBab ? `${querySeri} — Bab ${queryBab}` : '');
   const queryError = typeof query.error === 'string' ? query.error : null;
 
-  let currentUser: any = null;
+  let currentUser: { uid?: string; name?: string } | null = null;
   try {
     currentUser = await getCurrentUser();
   } catch (err) {

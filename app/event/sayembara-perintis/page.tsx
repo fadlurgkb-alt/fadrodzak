@@ -11,13 +11,9 @@ import {
   ArrowLeft,
   PenLine,
   CheckCircle2,
-  Calendar,
-  Share2,
-  Gift,
   Heart,
   MessageSquare,
   ShieldCheck,
-  Award,
 } from 'lucide-react';
 import ShareSayembaraButton from './ShareSayembaraButton';
 

@@ -4,21 +4,13 @@ import type { Metadata } from 'next';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '../../lib/auth-server';
-import GamificationCard from '../../components/GamificationCard';
-import BadgeCollection from '../../components/BadgeCollection';
-import PWAInstallButton from '../../components/PWAInstallButton';
 import LogoutButton from '../../components/LogoutButton';
-import StreakWidget from '../../components/StreakWidget';
-import KaryaSnippetPreview from '../../components/KaryaSnippetPreview';
 import RakBacaanClient from '../../components/RakBacaanClient';
 import ProfilTabsClient from '../../components/ProfilTabsClient';
-import { formatWaktuRelatif, formatWaktuLengkap } from '../../lib/date';
 import {
   ArrowLeft,
   Edit3,
   Feather,
-  Heart,
-  MessageSquare,
   Coffee,
   BookOpen,
   LogIn,
@@ -26,7 +18,6 @@ import {
   Award,
   Bookmark,
   PenLine,
-  Plus,
   ShieldCheck,
 } from 'lucide-react';
 import ReferralShareCard from '../../components/ReferralShareCard';
@@ -94,16 +85,6 @@ async function hapusKarya(formData: FormData) {
 
   revalidatePath('/profil');
   revalidatePath('/');
-}
-
-function toSafeISOString(d: unknown): string | undefined {
-  if (!d) return undefined;
-  try {
-    const dt = d instanceof Date ? d : new Date(d as string | number);
-    return isNaN(dt.getTime()) ? undefined : dt.toISOString();
-  } catch {
-    return undefined;
-  }
 }
 
 export default async function ProfilPage() {
@@ -235,18 +216,29 @@ export default async function ProfilPage() {
     (currentUser.email ? currentUser.email.split('@')[0] : 'Penulis Sastra');
   const defaultFoto = currentUser.picture || '';
 
-  try {
-    let profil = {
-      user_id: firebaseUid,
-      nama: defaultNama,
-      email: currentUser.email || '',
-      foto_url: defaultFoto,
-      status_badge: 'Pelajar Sastra',
-      bio: 'Pena baru di ruang sastra Fadrodzak.',
-      link_donasi: '',
-    };
+  let profil = {
+    user_id: firebaseUid,
+    nama: defaultNama,
+    email: currentUser.email || '',
+    foto_url: defaultFoto,
+    status_badge: 'Pelajar Sastra',
+    bio: 'Pena baru di ruang sastra Fadrodzak.',
+    link_donasi: '',
+  };
 
-    // Eksekusi semua query secara paralel (Promise.all) untuk menghilangkan jeda 6-12 detik
+  let gamification = {
+    xp: 0,
+    role: 'user',
+    isDonatur: false,
+    reputasi: 0,
+    accountStatus: 'active',
+  };
+
+  let userBadges: BadgeItem[] = [];
+  let karyaList: KaryaRow[] = [];
+
+  try {
+    // Eksekusi semua query secara paralel (Promise.all) untuk performa instan
     const [profilRes, gamifRes, badgeRes, karyaRes] = await Promise.all([
       pool
         .query(
@@ -340,14 +332,6 @@ export default async function ProfilPage() {
         .catch((insertErr) => console.warn('[Profil] Notice async profil:', insertErr));
     }
 
-    let gamification = {
-      xp: 0,
-      role: 'user',
-      isDonatur: false,
-      reputasi: 0,
-      accountStatus: 'active',
-    };
-
     const gamifRows = gamifRes.rows || [];
     if (gamifRows.length > 0) {
       gamification = {
@@ -370,7 +354,7 @@ export default async function ProfilPage() {
     }
 
     const badgeRows = badgeRes.rows || [];
-    const userBadges: BadgeItem[] = badgeRows.map((b) => ({
+    userBadges = badgeRows.map((b) => ({
       id: Number(b.id || 0),
       nama: String(b.nama || 'Lencana Sastra'),
       deskripsi: b.deskripsi ? String(b.deskripsi) : null,
@@ -378,22 +362,25 @@ export default async function ProfilPage() {
       rarity: String(b.rarity || 'common'),
     }));
 
-    const karyaList: KaryaRow[] = (karyaRes.rows || []) as KaryaRow[];
+    karyaList = (karyaRes.rows || []) as KaryaRow[];
+  } catch (pageError) {
+    console.warn('[ProfilPage Query Handled]:', pageError);
+  }
 
-    const totalSuka = (karyaList || []).reduce(
-      (sum, k) => sum + (k?.total_likes ?? k?.jumlah_suka ?? 0),
-      0
-    );
+  const totalSuka = (karyaList || []).reduce(
+    (sum, k) => sum + (k?.total_likes ?? k?.jumlah_suka ?? 0),
+    0
+  );
 
-    const isAdmin =
-      currentUser.email === 'fadlur.gkb@gmail.com' ||
-      currentUser.email === 'fadlur.gkb-alt@gmail.com' ||
-      gamification.role === 'admin';
+  const isAdmin =
+    currentUser.email === 'fadlur.gkb@gmail.com' ||
+    currentUser.email === 'fadlur.gkb-alt@gmail.com' ||
+    gamification.role === 'admin';
 
-    return (
-      <main className="min-h-screen p-4 sm:p-6 max-w-2xl mx-auto pb-24 text-[#2C2A29]">
-        {/* Header Bersih Ala Aplikasi Mobile */}
-        <div className="flex items-center justify-between mb-5 pb-3 border-b border-[#E8DED6]">
+  return (
+    <main className="min-h-screen p-4 sm:p-6 max-w-2xl mx-auto pb-24 text-[#2C2A29]">
+      {/* Header Bersih Ala Aplikasi Mobile */}
+      <div className="flex items-center justify-between mb-5 pb-3 border-b border-[#E8DED6]">
           <Link
             href="/"
             className="text-xs sm:text-sm text-[#C85A32] hover:text-[#A94728] flex items-center gap-1.5 font-medium transition"
@@ -557,58 +544,6 @@ export default async function ProfilPage() {
         />
       </main>
     );
-  } catch (pageError) {
-    console.error('[ProfilPage Error Handled]:', pageError);
-    return (
-      <main className="min-h-screen p-4 sm:p-8 max-w-4xl mx-auto pb-24 text-[#2C2A29]">
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#E8DED6]">
-          <Link
-            href="/"
-            className="text-xs sm:text-sm text-[#C85A32] hover:underline flex items-center gap-1.5 font-medium"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" /> Kembali ke Beranda
-          </Link>
-          <div className="flex items-center gap-2">
-            <Link
-              href="/tulis"
-              className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl bg-[#C85A32] hover:bg-[#A94728] text-white transition text-xs font-medium shadow-2xs"
-            >
-              <PenLine className="w-3.5 h-3.5" />
-              <span>Tulis Karya</span>
-            </Link>
-            <LogoutButton />
-          </div>
-        </div>
-
-        <div className="bg-[#FFFDF9] rounded-2xl border border-[#E8DED6] p-6 sm:p-8 shadow-2xs mb-8 text-center sm:text-left flex flex-col sm:flex-row items-center gap-6">
-          <div className="w-20 h-20 rounded-full bg-[#FAF8F5] text-[#C85A32] font-serif font-bold text-3xl flex items-center justify-center border border-[#E8DED6] shadow-2xs">
-            {defaultNama.charAt(0).toUpperCase()}
-          </div>
-          <div className="flex-1">
-            <h1 className="text-2xl font-serif font-bold text-[#2C2A29]">{defaultNama}</h1>
-            <p className="text-xs text-[#6B625D] font-mono mt-1">{currentUser.email || ''}</p>
-            <p className="text-sm text-[#6B625D] italic mt-2">
-              Akun Anda aktif. Sedang menyinkronkan data profil ke server. Silakan muat ulang atau buka beranda.
-            </p>
-            <div className="mt-4 flex items-center gap-3 justify-center sm:justify-start">
-              <Link
-                href="/profil"
-                className="px-4 py-2 rounded-xl bg-[#C85A32] text-white text-xs font-medium shadow-2xs hover:bg-[#A94728] transition"
-              >
-                Muat Ulang Profil
-              </Link>
-              <Link
-                href="/"
-                className="px-4 py-2 rounded-xl border border-[#E8DED6] bg-[#FFFDF9] text-xs text-[#6B625D] hover:text-[#2C2A29] transition"
-              >
-                Ke Beranda
-              </Link>
-            </div>
-          </div>
-        </div>
-      </main>
-    );
-  }
 }
 
 

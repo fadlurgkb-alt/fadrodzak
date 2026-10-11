@@ -4,7 +4,7 @@ import pool from '../../../../lib/db';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { getCurrentUser } from '../../../../lib/auth-server';
-import { ArrowLeft, BookOpen, Feather, Image, Plus, CheckCircle, Save } from 'lucide-react';
+import { ArrowLeft, BookOpen, Feather, Image, Plus, Save } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,7 +27,7 @@ export default async function EditKaryaPage({
     );
   }
 
-  let currentUser: any = null;
+  let currentUser: { uid?: string } | null = null;
   try {
     currentUser = await getCurrentUser();
   } catch (err) {

@@ -12,8 +12,6 @@ import {
   Heart,
   MessageSquare,
   Trash2,
-  ExternalLink,
-  Flame,
 } from 'lucide-react';
 import KaryaSnippetPreview from './KaryaSnippetPreview';
 import RakBacaanClient from './RakBacaanClient';

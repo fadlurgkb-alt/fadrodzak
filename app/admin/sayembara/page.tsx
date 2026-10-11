@@ -6,20 +6,15 @@ import { revalidatePath } from 'next/cache';
 import pool from '../../../lib/db';
 import { getCurrentUser } from '../../../lib/auth-server';
 import {
-  ShieldAlert,
   Trophy,
   Users,
   BookOpen,
   CheckCircle2,
   Clock,
-  Sparkles,
   ArrowLeft,
   ExternalLink,
-  Award,
   MessageSquare,
   Heart,
-  Shuffle,
-  Feather,
   Trash2,
 } from 'lucide-react';
 
@@ -52,6 +47,8 @@ interface KomentarItem {
   isi_komentar: string;
   created_at: string | Date;
   judul_karya?: string;
+  commenter_user_id?: string;
+  commenter_email?: string;
 }
 
 interface ReferralItem {
@@ -127,7 +124,7 @@ export default async function AdminSayembaraPage() {
     };
   } = {};
 
-  komentarList.forEach((c: any) => {
+  komentarList.forEach((c: KomentarItem) => {
     const nama = c.nama_pengguna || 'Anonim';
     const userId = c.commenter_user_id || nama;
     if (!pembacaStats[nama]) {

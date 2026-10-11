@@ -8,7 +8,6 @@ import {
   Share2,
   ExternalLink,
   ChevronRight,
-  Sparkles,
   Bookmark,
   BookmarkCheck,
   Check,
