@@ -6,11 +6,6 @@ on:
     - cron: '15 */3 * * *'
   # Tombol jalankan manual langsung dari tab Actions di GitHub
   workflow_dispatch:
-  # Tes otomatis saat file bot atau workflow diperbarui
-  push:
-    paths:
-      - 'bot_sastra_cron.js'
-      - '.github/workflows/bot-cron.yml'
 
 jobs:
   upload-karya:

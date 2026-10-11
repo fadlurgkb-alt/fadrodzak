@@ -122,13 +122,46 @@ async function kirimKaryaDenganRetry(payload, maxRetry = 3) {
   return false;
 }
 
+async function ambilDaftarJudulYangSudahAda() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/karya`, {
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'Fadrodzak-Bot-Sastra/2.0'
+      }
+    });
+    if (!res.ok) return [];
+    const list = await res.json();
+    if (Array.isArray(list)) {
+      return list.map((item) => (item.judul || '').trim().toLowerCase());
+    }
+  } catch (err) {
+    console.warn(`[Bot Warning] Tidak dapat mengambil daftar karya: ${err.message}`);
+  }
+  return [];
+}
+
 async function main() {
   console.log(`=== BOT SASTRA FADRODZAK RUNNER ===`);
   console.log(`Waktu eksekusi: ${new Date().toISOString()}`);
   console.log(`Target URL: ${API_BASE_URL}`);
 
+  // 1. Cek karya yang sudah ada di platform agar TIDAK TERJADI DUPLIKASI ganda/tiga kali
+  const existingTitles = await ambilDaftarJudulYangSudahAda();
+  console.log(`Ditemukan ${existingTitles.length} karya aktif di platform.`);
+
+  // 2. Filter hanya karya yang belum pernah diterbitkan sama sekali
+  const karyaTersedia = BANK_KARYA.filter((k) => !existingTitles.includes(k.judul.trim().toLowerCase()));
+
+  if (karyaTersedia.length === 0) {
+    console.log(`ℹ️ [LEWATI] Semua karya di Bank Karya bot sudah pernah terbit di platform.`);
+    console.log(`Bot tidak akan mengunggah karya duplikat.`);
+    process.exit(0);
+  }
+
+  // Pilih satu karya yang belum ada dan satu penulis acak
   const penulis = PENULIS_LIST[Math.floor(Math.random() * PENULIS_LIST.length)];
-  const karya = BANK_KARYA[Math.floor(Math.random() * BANK_KARYA.length)];
+  const karya = karyaTersedia[Math.floor(Math.random() * karyaTersedia.length)];
 
   const payload = {
     judul: karya.judul,

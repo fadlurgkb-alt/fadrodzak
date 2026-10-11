@@ -890,6 +890,25 @@ async function runMemoryQuery(text: string, params: any[] = []): Promise<{ rows:
     return { rows: [], rowCount: 1 };
   }
 
+  if (upper.startsWith('DELETE FROM KARYA')) {
+    if (upper.includes('WHERE ID = $1')) {
+      const targetId = Number(params[0]);
+      const initialLen = memoryStore.karyas.length;
+      memoryStore.karyas = memoryStore.karyas.filter((k: KaryaItem) => k.id !== targetId);
+      const deletedCount = initialLen - memoryStore.karyas.length;
+      saveStoreToDisk();
+      return { rows: [], rowCount: deletedCount };
+    }
+    if (upper.includes('WHERE ID = ANY($1)')) {
+      const idsToDelete = (params[0] || []).map((x: any) => Number(x));
+      const initialLen = memoryStore.karyas.length;
+      memoryStore.karyas = memoryStore.karyas.filter((k: KaryaItem) => !idsToDelete.includes(k.id));
+      const deletedCount = initialLen - memoryStore.karyas.length;
+      saveStoreToDisk();
+      return { rows: [], rowCount: deletedCount };
+    }
+  }
+
   // 4. LIKES
   if (upper.includes('FROM LIKES')) {
     if (upper.includes('COUNT(*)')) {

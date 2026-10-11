@@ -20,6 +20,7 @@ import {
   Heart,
   Shuffle,
   Feather,
+  Trash2,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -203,6 +204,41 @@ export default async function AdminSayembaraPage() {
     revalidatePath('/profil');
   }
 
+  // Server Action untuk Membersihkan Karya Bot yang Duplikat (Menyisakan 1 karya saja per judul)
+  async function bersihkanDuplikatBotAction() {
+    'use server';
+    try {
+      // Ambil seluruh karya diurutkan berdasarkan id ASC (karya pertama yang dibuat dipertahankan)
+      const res = await pool.query('SELECT id, judul FROM karya ORDER BY id ASC');
+      const seenTitles = new Set<string>();
+      const idsToDelete: number[] = [];
+
+      for (const row of res.rows || []) {
+        const titleKey = String(row.judul || '').trim().toLowerCase();
+        if (titleKey) {
+          if (seenTitles.has(titleKey)) {
+            idsToDelete.push(Number(row.id));
+          } else {
+            seenTitles.add(titleKey);
+          }
+        }
+      }
+
+      if (idsToDelete.length > 0) {
+        for (const id of idsToDelete) {
+          // Bersihkan relasi komentar dan like terlebih dahulu
+          await pool.query('DELETE FROM komentar WHERE karya_id = $1', [id]).catch(() => {});
+          await pool.query('DELETE FROM likes WHERE karya_id = $1', [id]).catch(() => {});
+          await pool.query('DELETE FROM karya WHERE id = $1', [id]);
+        }
+      }
+    } catch (err) {
+      console.warn('[Admin] Bersihkan duplikat notice:', err);
+    }
+    revalidatePath('/');
+    revalidatePath('/admin/sayembara');
+  }
+
   return (
     <main className="min-h-screen pb-28 pt-6 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto text-[#2C2A29]">
       {/* Header Admin */}
@@ -225,7 +261,19 @@ export default async function AdminSayembaraPage() {
           </h1>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Tombol Bersihkan Duplikat Bot Otomatis */}
+          <form action={bersihkanDuplikatBotAction}>
+            <button
+              type="submit"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs font-semibold hover:bg-amber-100 hover:border-amber-400 transition shadow-2xs cursor-pointer"
+              title="Cari dan hapus tulisan bot yang terbit lebih dari sekali (hanya menyisakan 1 naskah asli)"
+            >
+              <Trash2 className="w-3.5 h-3.5 text-amber-700" />
+              <span>Bersihkan Tulisan Duplikat</span>
+            </button>
+          </form>
+
           <Link
             href="/event/sayembara-perintis"
             target="_blank"
