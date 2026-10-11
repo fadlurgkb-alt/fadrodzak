@@ -56,30 +56,6 @@ export default function LoginPage() {
   }
 
   /**
-   * Login Mode Demo / Uji Coba (Tidak memerlukan Firebase API Key)
-   */
-  const handleDemoLogin = async () => {
-    setErrorMsg('');
-    setLoading(true);
-
-    try {
-      await syncSession('demo_token', {
-        uid: 'guest_user',
-        displayName: 'Fadrodzak (Penulis)',
-        email: 'fadrodzak@aksara.id',
-        photoURL: '',
-      });
-
-      router.push('/profil');
-      router.refresh();
-    } catch (err: unknown) {
-      setErrorMsg((err as Error)?.message || 'Gagal masuk dengan akun demo.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /**
    * Login Google dengan Pemilih Akun (Multi-Account Support)
    */
   const handleGoogleLogin = async () => {
@@ -87,7 +63,7 @@ export default function LoginPage() {
 
     if (!isFirebaseConfigured) {
       setErrorMsg(
-        'Kunci Firebase API Key belum diatur di file .env.local (masih memakai kunci demo bawaan). Silakan masukkan NEXT_PUBLIC_FIREBASE_API_KEY dari Firebase Console Anda, atau gunakan tombol "Masuk Cepat Mode Uji Coba" di bawah.'
+        'Kunci Firebase API Key belum diatur di file konfigurasi. Silakan periksa pengaturan Firebase Anda.'
       );
       return;
     }
@@ -257,24 +233,6 @@ export default function LoginPage() {
           </svg>
           {loading ? 'Menghubungkan Akun...' : 'Masuk dengan Akun Google'}
         </button>
-
-        {/* Tombol Masuk Cepat / Demo (Untuk pengujian lokal tanpa setup Firebase) */}
-        <div className="mt-3.5 p-3.5 bg-[#FAF0E6] rounded-xl border border-[#C85A32]/30 text-center">
-          <p className="text-[11px] font-serif text-[#736B63] mb-2 leading-relaxed">
-            {!isFirebaseConfigured
-              ? '💡 Kunci Firebase API belum disetel di .env.local. Anda dapat langsung masuk mode pengujian di bawah ini:'
-              : 'Atau masuk instan tanpa akun Google:'}
-          </p>
-          <button
-            onClick={handleDemoLogin}
-            disabled={loading}
-            type="button"
-            className="w-full py-2 px-3 bg-[#C85A32] hover:bg-[#A94824] text-white rounded-lg text-xs font-serif font-bold transition shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer"
-          >
-            <span>🪶</span>
-            <span>Masuk Cepat Mode Uji Coba (Akun Fadrodzak)</span>
-          </button>
-        </div>
 
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
