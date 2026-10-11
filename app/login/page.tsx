@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   signInWithPopup,
   signInWithEmailAndPassword,
@@ -15,7 +16,11 @@ import FadrodzakLogo from '@/components/FadrodzakLogo';
 export default function LoginPage() {
   const router = useRouter();
 
+  // State tampilan morphing gooey
+  const [isOpen, setIsOpen] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
+
+  // Form states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [nama, setNama] = useState('');
@@ -123,7 +128,7 @@ export default function LoginPage() {
 
     if (!isFirebaseConfigured) {
       setErrorMsg(
-        'Kunci Firebase API Key belum diatur di file .env.local. Silakan masukkan NEXT_PUBLIC_FIREBASE_API_KEY dari Firebase Console Anda, atau gunakan tombol "Masuk Cepat Mode Uji Coba" di atas.'
+        'Kunci Firebase API Key belum diatur di file .env.local. Silakan periksa konfigurasi Firebase Anda.'
       );
       return;
     }
@@ -178,7 +183,7 @@ export default function LoginPage() {
         String(err).includes('auth/api-key-not-valid')
       ) {
         setErrorMsg(
-          'API Key Firebase tidak valid. Pastikan NEXT_PUBLIC_FIREBASE_API_KEY di file .env.local sudah diisi dengan API Key proyek Firebase Anda.'
+          'API Key Firebase tidak valid. Pastikan NEXT_PUBLIC_FIREBASE_API_KEY di file .env.local sudah diisi.'
         );
       } else {
         setErrorMsg((err as Error)?.message || 'Gagal memproses autentikasi.');
@@ -189,147 +194,306 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F9F6F0] flex items-center justify-center p-4 font-sans text-[#2B2B2B]">
-      <div className="max-w-md w-full bg-white border border-[#E8DEC0] rounded-2xl p-8 shadow-sm">
-        {/* Brand Header & Logo */}
-        <div className="text-center mb-8 flex flex-col items-center">
-          <FadrodzakLogo size="lg" variant="compact" showLink={true} className="justify-center mb-2" />
-          <p className="text-xs font-serif italic text-[#736B63]">
-            &ldquo;Tempat di mana kata-kata menemukan rumahnya&rdquo;
-          </p>
-        </div>
+    <div className="min-h-screen bg-[#F5EFEB] flex flex-col items-center justify-center p-4 font-sans text-[#2B2B2B] relative overflow-hidden selection:bg-[#C85A32]/20 selection:text-[#1F1916]">
+      {/* 1. FILTER SVG GOOEY (Efek Cairan / Tetesan Tinta Sastra) */}
+      <svg className="absolute w-0 h-0 pointer-events-none" aria-hidden="true">
+        <defs>
+          <filter id="ink-goo">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
+            <feColorMatrix
+              in="blur"
+              mode="matrix"
+              values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -9"
+              result="goo"
+            />
+            <feBlend in="SourceGraphic" in2="goo" />
+          </filter>
+        </defs>
+      </svg>
 
-        {errorMsg && (
-          <div className="mb-5 p-3.5 bg-red-50 text-red-700 text-xs rounded-xl border border-red-200 flex items-start gap-2">
-            <span>⚠️</span>
-            <span>{errorMsg}</span>
-          </div>
-        )}
+      {/* Ornamen Latar Belakang Klasik Sastra */}
+      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(#C85A32_0.75px,transparent_0.75px)] [background-size:24px_24px] opacity-15" />
 
-        {/* Tombol Login Google Utama */}
-        <button
-          onClick={handleGoogleLogin}
-          disabled={loading}
-          type="button"
-          className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white border border-[#E0D8CC] rounded-xl hover:bg-[#FAF8F5] transition text-sm font-medium shadow-xs disabled:opacity-50 cursor-pointer"
+      {/* Brand Header & Logo Luar */}
+      <motion.div 
+        initial={{ opacity: 0, y: -16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="text-center mb-6 flex flex-col items-center z-10"
+      >
+        <FadrodzakLogo size="lg" variant="compact" showLink={true} className="justify-center mb-2" />
+        <p className="text-xs font-serif italic text-[#736B63] tracking-wide">
+          &ldquo;Tempat di mana kata-kata menemukan rumahnya&rdquo;
+        </p>
+      </motion.div>
+
+      {/* 2. AREA EFEK CAIRAN GOOEY & KOTAK AKSARA */}
+      <div className="relative flex flex-col items-center justify-center w-full max-w-lg min-h-[500px]">
+        {/* Lapisan Efek Gooey Filter (Di belakang isi interaktif agar teks/input tetap tajam & jernih) */}
+        <div 
+          style={{ filter: 'url(#ink-goo)' }} 
+          className="absolute inset-0 flex items-center justify-center pointer-events-none z-0"
         >
-          <svg className="w-5 h-5" viewBox="0 0 24 24">
-            <path
-              fill="#4285F4"
-              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-            />
-            <path
-              fill="#34A853"
-              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-            />
-            <path
-              fill="#FBBC05"
-              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-            />
-            <path
-              fill="#EA4335"
-              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-            />
-          </svg>
-          {loading ? 'Menghubungkan Akun...' : 'Masuk dengan Akun Google'}
-        </button>
+          {/* Tetesan Tinta Kecil yang Mengalir/Melayang */}
+          <motion.div
+            animate={{
+              y: isOpen ? -200 : -55,
+              opacity: isOpen ? 0 : [0.7, 1, 0.7],
+              scale: isOpen ? 0.3 : [1, 1.15, 1],
+            }}
+            transition={{
+              duration: isOpen ? 0.4 : 3,
+              repeat: isOpen ? 0 : Infinity,
+              ease: 'easeInOut',
+            }}
+            className="absolute w-11 h-11 bg-[#1F1916] rounded-full shadow-md"
+          />
 
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-[#E8DEC0]"></div>
-          </div>
-          <div className="relative flex justify-center text-xs uppercase tracking-wider">
-            <span className="bg-white px-3 text-[#A5958A] font-serif">atau via email</span>
-          </div>
+          {/* Tetesan Sekunder (Aksen Terracotta Halus) */}
+          <motion.div
+            animate={{
+              y: isOpen ? -180 : -42,
+              x: isOpen ? 0 : 26,
+              opacity: isOpen ? 0 : 0.6,
+              scale: isOpen ? 0.2 : 0.8,
+            }}
+            transition={{
+              duration: 0.5,
+              ease: 'backOut',
+            }}
+            className="absolute w-7 h-7 bg-[#C85A32] rounded-full"
+          />
+
+          {/* Blob Kontainer Utama yang Mengembang (Gooey Shape) */}
+          <motion.div
+            animate={{
+              width: isOpen ? (isRegister ? 440 : 420) : 210,
+              height: isOpen ? (isRegister ? 600 : 540) : 56,
+              borderRadius: isOpen ? 28 : 28,
+            }}
+            transition={{
+              duration: 0.7,
+              type: 'spring',
+              stiffness: 140,
+              damping: 18,
+            }}
+            className="bg-[#1F1916] shadow-2xl relative"
+          />
         </div>
 
-        {/* Form Email / Sandi */}
-        <form onSubmit={handleSubmitEmail} className="space-y-4">
-          {isRegister && (
-            <div>
-              <label className="block text-xs font-semibold text-[#736B63] uppercase tracking-wider mb-1.5 font-serif">
-                Nama Pena
-              </label>
-              <input
-                type="text"
-                required
-                value={nama}
-                onChange={(e) => setNama(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-[#E0D8CC] focus:ring-2 focus:ring-[#C85A32] bg-[#FAF8F5] text-sm outline-none"
-                placeholder="misal: Amir Hamzah"
-              />
-            </div>
-          )}
-
-          <div>
-            <label className="block text-xs font-semibold text-[#736B63] uppercase tracking-wider mb-1.5 font-serif">
-              Alamat Email
-            </label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl border border-[#E0D8CC] focus:ring-2 focus:ring-[#C85A32] bg-[#FAF8F5] text-sm outline-none"
-              placeholder="penulis@aksara.id"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-[#736B63] uppercase tracking-wider mb-1.5 font-serif">
-              Kata Sandi
-            </label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl border border-[#E0D8CC] focus:ring-2 focus:ring-[#C85A32] bg-[#FAF8F5] text-sm outline-none"
-              placeholder="Minimal 6 karakter"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 px-4 bg-[#C85A32] hover:bg-[#A94824] text-white rounded-xl font-medium transition text-sm shadow-xs disabled:opacity-50 font-serif cursor-pointer"
-          >
-            {loading ? 'Memproses...' : isRegister ? 'Daftar Akun Baru' : 'Masuk ke Ruang Sastra'}
-          </button>
-        </form>
-
-        <div className="mt-6 text-center text-xs text-[#736B63]">
-          {isRegister ? (
-            <p>
-              Sudah punya akun pena?{' '}
-              <button
-                type="button"
-                onClick={() => setIsRegister(false)}
-                className="text-[#C85A32] font-semibold hover:underline cursor-pointer"
+        {/* 3. KONTEN INTERAKTIF (Di lapisan z-10 di atas filter agar tajam, nyaman diketik & diakses) */}
+        <div className="relative z-10 w-full flex items-center justify-center p-3">
+          <AnimatePresence mode="wait">
+            {!isOpen ? (
+              /* State Tombol Pelatuk Awal (Tertutup) */
+              <motion.button
+                key="trigger-button"
+                onClick={() => setIsOpen(true)}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="w-[210px] h-[56px] rounded-full flex items-center justify-center gap-2.5 text-[#F5EFEB] font-serif tracking-wider text-base cursor-pointer shadow-lg hover:text-white transition-colors"
+                title="Buka Ruang Aksara"
               >
-                Masuk di sini
-              </button>
-            </p>
-          ) : (
-            <p>
-              Belum terdaftar sebagai penulis?{' '}
-              <button
-                type="button"
-                onClick={() => setIsRegister(true)}
-                className="text-[#C85A32] font-semibold hover:underline cursor-pointer"
+                <span className="w-2 h-2 rounded-full bg-[#C85A32] animate-pulse" />
+                <span>Masuk Aksara</span>
+                <span className="text-xs text-[#E8DEC0]/60 font-sans tracking-normal">→</span>
+              </motion.button>
+            ) : (
+              /* State Kontainer Terbuka: Form Lengkap Ruang Aksara */
+              <motion.div
+                key="open-card"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 15 }}
+                transition={{ duration: 0.45, delay: 0.15 }}
+                className="w-full max-w-[430px] p-6 sm:p-8 text-[#F5EFEB] flex flex-col justify-between"
               >
-                Buat akun sekarang
-              </button>
-            </p>
-          )}
-        </div>
+                {/* Header Kotak */}
+                <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-5">
+                  <div>
+                    <h2 className="text-xl font-serif text-[#FAF8F5] tracking-wide">
+                      {isRegister ? 'Pendaftaran Penulis' : 'Masuk ke Ruang Aksara'}
+                    </h2>
+                    <p className="text-[11px] text-[#A5958A] mt-0.5">
+                      {isRegister ? 'Torehkan bait dan cerita pertamamu' : 'Lanjutkan lembar karya dan renunganmu'}
+                    </p>
+                  </div>
+                  {/* Tombol Tutup / Susutkan */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsOpen(false);
+                      setErrorMsg('');
+                    }}
+                    aria-label="Tutup formulir"
+                    className="p-1.5 rounded-full text-[#A5958A] hover:text-white hover:bg-white/10 transition cursor-pointer"
+                  >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
 
-        <div className="mt-6 pt-4 border-t border-[#E8DEC0]/60 text-center">
-          <Link href="/" className="text-xs text-[#736B63] hover:text-[#2B2B2B] transition font-serif">
-            &larr; Kembali ke Beranda
-          </Link>
+                {/* Pesan Kesalahan */}
+                {errorMsg && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="mb-4 p-3 bg-red-950/70 text-red-200 text-xs rounded-xl border border-red-800/60 flex items-start gap-2"
+                  >
+                    <span className="shrink-0 text-red-400">⚠️</span>
+                    <span className="leading-relaxed">{errorMsg}</span>
+                  </motion.div>
+                )}
+
+                {/* Tombol Google Auth */}
+                <button
+                  onClick={handleGoogleLogin}
+                  disabled={loading}
+                  type="button"
+                  className="w-full flex items-center justify-center gap-3 py-2.5 px-4 bg-white text-[#1F1916] rounded-xl hover:bg-[#FAF8F5] transition text-sm font-medium shadow-sm disabled:opacity-50 cursor-pointer active:scale-[0.99]"
+                >
+                  <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                    <path
+                      fill="#4285F4"
+                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    />
+                    <path
+                      fill="#34A853"
+                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    />
+                    <path
+                      fill="#FBBC05"
+                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+                    />
+                    <path
+                      fill="#EA4335"
+                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+                    />
+                  </svg>
+                  <span>{loading ? 'Menghubungkan Akun...' : 'Masuk dengan Akun Google'}</span>
+                </button>
+
+                {/* Pemisah Garis Sastra */}
+                <div className="relative my-4">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-white/10" />
+                  </div>
+                  <div className="relative flex justify-center text-[10px] uppercase tracking-widest">
+                    <span className="bg-[#1F1916] px-3 text-[#A5958A] font-serif">atau lewat email</span>
+                  </div>
+                </div>
+
+                {/* Form Email / Sandi */}
+                <form onSubmit={handleSubmitEmail} className="space-y-3.5">
+                  {isRegister && (
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#A5958A] uppercase tracking-wider mb-1 font-serif">
+                        Nama Pena
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={nama}
+                        onChange={(e) => setNama(e.target.value)}
+                        className="w-full px-3.5 py-2 rounded-xl bg-stone-800/90 border border-stone-700 text-[#F5EFEB] placeholder-stone-500 text-sm outline-none focus:border-[#C85A32] focus:ring-1 focus:ring-[#C85A32] transition"
+                        placeholder="misal: Amir Hamzah"
+                      />
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-[#A5958A] uppercase tracking-wider mb-1 font-serif">
+                      Alamat Email
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full px-3.5 py-2 rounded-xl bg-stone-800/90 border border-stone-700 text-[#F5EFEB] placeholder-stone-500 text-sm outline-none focus:border-[#C85A32] focus:ring-1 focus:ring-[#C85A32] transition"
+                      placeholder="penulis@aksara.id"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-semibold text-[#A5958A] uppercase tracking-wider mb-1 font-serif">
+                      Kata Sandi
+                    </label>
+                    <input
+                      type="password"
+                      required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full px-3.5 py-2 rounded-xl bg-stone-800/90 border border-stone-700 text-[#F5EFEB] placeholder-stone-500 text-sm outline-none focus:border-[#C85A32] focus:ring-1 focus:ring-[#C85A32] transition"
+                      placeholder="Minimal 6 karakter"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full mt-2 py-2.5 px-4 bg-[#C85A32] hover:bg-[#A94824] text-white rounded-xl font-medium transition text-sm shadow-md disabled:opacity-50 font-serif cursor-pointer active:scale-[0.99]"
+                  >
+                    {loading ? 'Memproses...' : isRegister ? 'Daftarkan Akun' : 'Masuk ke Ruang Aksara'}
+                  </button>
+                </form>
+
+                {/* Sakelar Masuk / Daftar */}
+                <div className="mt-4 pt-3 border-t border-white/10 text-center text-xs text-[#A5958A]">
+                  {isRegister ? (
+                    <p>
+                      Sudah punya akun pena?{' '}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsRegister(false);
+                          setErrorMsg('');
+                        }}
+                        className="text-[#E07A5F] hover:text-[#C85A32] font-semibold underline underline-offset-2 cursor-pointer transition"
+                      >
+                        Masuk di sini
+                      </button>
+                    </p>
+                  ) : (
+                    <p>
+                      Belum terdaftar sebagai penulis?{' '}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsRegister(true);
+                          setErrorMsg('');
+                        }}
+                        className="text-[#E07A5F] hover:text-[#C85A32] font-semibold underline underline-offset-2 cursor-pointer transition"
+                      >
+                        Buat akun sekarang
+                      </button>
+                    </p>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
+
+      {/* Tautan Kembali ke Beranda */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        className="mt-6 z-10 text-center"
+      >
+        <Link 
+          href="/" 
+          className="text-xs text-[#736B63] hover:text-[#1F1916] transition font-serif tracking-wide underline underline-offset-4 decoration-[#736B63]/40"
+        >
+          &larr; Kembali ke Beranda Fadrodzak
+        </Link>
+      </motion.div>
     </div>
   );
 }
