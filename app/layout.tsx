@@ -1,24 +1,12 @@
 import './globals.css';
 import type { Metadata, Viewport } from 'next';
-import { Cormorant_Garamond, Inter } from 'next/font/google';
 import BottomNav from '../components/BottomNav';
 import DoveChatBubble from '../components/DoveChatBubble';
 import Footer from '../components/Footer';
 import Toast from '../components/Toast';
 
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-cormorant',
-  display: 'swap',
-});
-
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-inter',
-  display: 'swap',
-});
+const cormorant = { variable: 'font-serif' };
+const inter = { variable: 'font-sans' };
 
 export const viewport: Viewport = {
   themeColor: '#C85A32',
