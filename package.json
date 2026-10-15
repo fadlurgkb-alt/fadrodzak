@@ -7,7 +7,8 @@
     "build": "next build --webpack",
     "start": "next start -p 3000 -H 0.0.0.0",
     "lint": "eslint",
-    "db:migrate": "tsx scripts/migrate.ts"
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:import-neon": "tsx scripts/migrate_from_neon.ts"
   },
   "dependencies": {
     "@types/canvas-confetti": "^1.9.0",
